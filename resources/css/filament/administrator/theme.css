@@ -1,0 +1,84 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+.fi-treatment-plan-busy-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    cursor: wait;
+    pointer-events: all;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+}
+
+.fi-treatment-plan-busy-message {
+    border: 1px solid rgba(120, 113, 108, 0.18);
+    border-radius: 0.625rem;
+    background: #f7f7f5;
+    padding: 0.75rem 1rem;
+    color: #44403c;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(68, 64, 60, 0.14);
+}
+
+.fi-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+}
+
+.fi-loading-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+}
+
+.fi-loading-spinner {
+    width: 32px;
+    height: 32px;
+    color: #e5e7eb;
+    fill: #2563eb;
+    animation: fi-spin 0.8s linear infinite;
+}
+
+.fi-loading-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+
+@keyframes fi-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (min-width: 1280px) {
+    .fi-sidebar {
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
+        box-shadow: 4px 0 16px rgba(0, 0, 0, 0.06);
+        z-index: 20;
+    }
+}
