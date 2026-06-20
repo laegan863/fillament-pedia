@@ -8,6 +8,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -31,6 +32,15 @@ class FormDemographicsForm
         return $schema
             ->columns(1)
             ->components([
+                View::make('filament.forms.components.loading-overlay')
+                ->viewData([
+                    'target' => [
+                        'data.philhealth_pin_na',
+                        'data.same_as_permanent_address',
+                        'data.mobile_contact_na',
+                        'data.email_na',
+                    ],
+                ])->liberatedFromContainerGrid(),
                 Section::make('Encounter and Patient')
                     ->columnSpanFull()
                     ->columns([

@@ -13,6 +13,12 @@ class ListFormDemographics extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            CreateAction::make()
+            ->icon('heroicon-o-arrow-uturn-left')
+            ->label('Return')
+            ->url(fn (): string => self::getResource()::getUrl('index',[
+                'formId' => request()->query('formId'),
+            ])),
             CreateAction::make(),
         ];
     }

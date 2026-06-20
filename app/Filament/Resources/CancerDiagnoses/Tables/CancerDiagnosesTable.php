@@ -15,9 +15,21 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CancerDiagnosesTable
 {
+
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query): Builder {
+                    return $query
+                        ->with('formDemographic')
+                        ->when(
+                            request()->filled('formId'),
+                            fn (Builder $query) => $query->where(
+                                'form_demographic_id',
+                                request()->integer('formId')
+                            )
+                        );
+                })
             ->columns([
                 TextColumn::make('id')
                     ->label('ID')

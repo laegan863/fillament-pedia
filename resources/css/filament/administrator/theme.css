@@ -10,14 +10,14 @@
     z-index: 2147483647;
     align-items: center;
     justify-content: center;
-    opacity: 0.75;
+    /* opacity: 0.75; */
     cursor: wait;
     pointer-events: all;
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
+    /* backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px); */
 }
 
-.fi-treatment-plan-busy-message {
+/* .fi-treatment-plan-busy-message {
     border: 1px solid rgba(120, 113, 108, 0.18);
     border-radius: 0.625rem;
     background: #f7f7f5;
@@ -62,7 +62,7 @@
     font-size: 14px;
     font-weight: 500;
     color: #374151;
-}
+} */
 
 @keyframes fi-spin {
     from {

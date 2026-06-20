@@ -20,9 +20,7 @@ class ListCancerDiagnoses extends ListRecords
             ->label('Return') 
             ->icon('heroicon-o-arrow-uturn-left')
             ->extraAttributes(['class' => 'me-auto'])
-            ->url(fn (): string => FormDemographicsResource::getUrl('index', [
-                'formId' => request()->query('formId'),
-            ])),
+            ->url(fn (): string => FormDemographicsResource::getUrl('index')),
 
             CreateAction::make()->label('New cancer diagnose')
             ->url(fn (): string => static::getResource()::getUrl('create', [

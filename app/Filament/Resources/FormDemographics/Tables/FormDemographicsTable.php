@@ -47,13 +47,13 @@ class FormDemographicsTable
                             ->options([
                                 'form1' => 'FORM 1A - PRIMARY CANCER DIAGNOSE FORM',
                                 'follow_up' => 'FORM 2 - PATIENT FOLLOW-UP FORM',
-                                'amendment' => 'FORM 2A - PRIMARY CANCER AMENDMENT FORM',
-                                'surgery' => 'FORM 2B - SURGERY DATA',
-                                'drug_therapy' => 'FORM 2C - ANTI-CANCER DRUG THERAPY',
-                                'radiotherapy' => 'FORM 2D - RADIOTHERAPY',
-                                'theranostics' => 'FORM 2E - THERANOSTICS',
-                                'palliative_care' => 'FORM 2F - PALLIATIVE CARE',
-                                'other_therapies' => 'FORM 2G - OTHER CANCER-DIRECTED THERAPIES',
+                                // 'amendment' => 'FORM 2A - PRIMARY CANCER AMENDMENT FORM',
+                                // 'surgery' => 'FORM 2B - SURGERY DATA',
+                                // 'drug_therapy' => 'FORM 2C - ANTI-CANCER DRUG THERAPY',
+                                // 'radiotherapy' => 'FORM 2D - RADIOTHERAPY',
+                                // 'theranostics' => 'FORM 2E - THERANOSTICS',
+                                // 'palliative_care' => 'FORM 2F - PALLIATIVE CARE',
+                                // 'other_therapies' => 'FORM 2G - OTHER CANCER-DIRECTED THERAPIES',
                             ])
                             ->native(false)
                             ->searchable()
@@ -69,33 +69,33 @@ class FormDemographicsTable
                                 'formId' => $record->id,
                             ]),
 
-                            'amendment' => AmendmentFormResource::getUrl('index', [
-                                'formId' => $record->id,
-                            ]),
+                            // 'amendment' => AmendmentFormResource::getUrl('index', [
+                            //     'formId' => $record->id,
+                            // ]),
 
-                            'surgery' => SurgeryDataFormResource::getUrl('index', [
-                                'formId' => $record->id,
-                            ]),
+                            // 'surgery' => SurgeryDataFormResource::getUrl('index', [
+                            //     'formId' => $record->id,
+                            // ]),
 
-                            'drug_therapy' => DrugTherapyFormResource::getUrl('index', [
-                                'formId' => $record->id,
-                            ]),
+                            // 'drug_therapy' => DrugTherapyFormResource::getUrl('index', [
+                            //     'formId' => $record->id,
+                            // ]),
 
-                            'radiotherapy' => RadiotherapyFormResource::getUrl('index', [
-                                'formId' => $record->id,
-                            ]),
+                            // 'radiotherapy' => RadiotherapyFormResource::getUrl('index', [
+                            //     'formId' => $record->id,
+                            // ]),
 
-                            'theranostics' => TheranosticsFormResource::getUrl('index', [
-                                'formId' => $record->id,
-                            ]),
+                            // 'theranostics' => TheranosticsFormResource::getUrl('index', [
+                            //     'formId' => $record->id,
+                            // ]),
 
-                            'palliative_care' => PalliativeCareFormResource::getUrl('index', [
-                                'formId' => $record->id,
-                            ]),
+                            // 'palliative_care' => PalliativeCareFormResource::getUrl('index', [
+                            //     'formId' => $record->id,
+                            // ]),
 
-                            'other_therapies' => OtherCancerDirectedTherapiesFormResource::getUrl('index', [
-                                'formId' => $record->id,
-                            ]),
+                            // 'other_therapies' => OtherCancerDirectedTherapiesFormResource::getUrl('index', [
+                            //     'formId' => $record->id,
+                            // ]),
 
                             default => null,
                         };

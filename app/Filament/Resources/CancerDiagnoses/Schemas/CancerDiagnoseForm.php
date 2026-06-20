@@ -54,7 +54,7 @@ class CancerDiagnoseForm
                 //             ->required()
                 //     ]),
 
-                View::make('filament.forms.components.treatment-plan-loading-overlay')
+                View::make('filament.forms.components.loading-overlay')
                 ->viewData([
                     'target' => [
                         'data.has_surgery',

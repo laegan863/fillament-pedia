@@ -18,7 +18,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Width;
 
 class PatientFollowUpFormForm
 {
@@ -67,7 +66,7 @@ class PatientFollowUpFormForm
                             ->inline()
                             ->default(0)
                             ->live()
-                            ->dehydrateStateUsing(fn ($state): bool => (bool) $state),
+                            ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
 
                         Radio::make('has_more_than_one_primary_site')
                             ->label('Was there more than one primary site being treated in the past quarter?')
@@ -78,7 +77,7 @@ class PatientFollowUpFormForm
                             ->inline()
                             ->default(0)
                             ->live()
-                            ->dehydrateStateUsing(fn ($state): bool => (bool) $state),
+                            ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
 
                         Select::make('primary_sites_being_treated')
                             ->label('Primary Sites Being Treated')
@@ -112,29 +111,29 @@ class PatientFollowUpFormForm
                     ->columnSpanFull()
                     ->schema([
                         CheckboxList::make('procedures_administered')
-                        ->label('Procedures Administered')
-                        ->options([
-                            'Surgery' => 'Surgery',
-                            'Anti-cancer drug therapy' => 'Anti-cancer drug therapy',
-                            'Radiotherapy' => 'Radiotherapy',
-                            'Theranostics' => 'Theranostics',
-                            'Palliative Care' => 'Palliative Care',
-                            'Other Treatments' => 'Other Treatments',
-                        ])
-                        ->descriptions([
-                            'Surgery' => 'Encode the relevant data to Form 2B Surgery',
-                            'Anti-cancer drug therapy' => 'Encode the relevant data to Form 2C Anti-Cancer Drug Therapy',
-                            'Radiotherapy' => 'Encode the relevant data to Form 2D Radiotherapy',
-                            'Theranostics' => 'Encode the relevant data to Form 2E Theranostics',
-                            'Palliative Care' => 'Encode the relevant data to Form 2F Palliative Care',
-                            'Other Treatments' => 'Encode the relevant data to Form 2G Other Treatments',
-                        ])
-                        ->columns([
-                            'default' => 1,
-                            'md' => 2,
-                        ])
-                        ->live()
-                        ->bulkToggleable(),
+                            ->label('Procedures Administered')
+                            ->options([
+                                'Surgery' => 'Surgery',
+                                'Anti-cancer drug therapy' => 'Anti-cancer drug therapy',
+                                'Radiotherapy' => 'Radiotherapy',
+                                'Theranostics' => 'Theranostics',
+                                'Palliative Care' => 'Palliative Care',
+                                'Other Treatments' => 'Other Treatments',
+                            ])
+                            ->descriptions([
+                                'Surgery' => 'Encode the relevant data to Form 2B Surgery',
+                                'Anti-cancer drug therapy' => 'Encode the relevant data to Form 2C Anti-Cancer Drug Therapy',
+                                'Radiotherapy' => 'Encode the relevant data to Form 2D Radiotherapy',
+                                'Theranostics' => 'Encode the relevant data to Form 2E Theranostics',
+                                'Palliative Care' => 'Encode the relevant data to Form 2F Palliative Care',
+                                'Other Treatments' => 'Encode the relevant data to Form 2G Other Treatments',
+                            ])
+                            ->columns([
+                                'default' => 1,
+                                'md' => 2,
+                            ])
+                            ->live()
+                            ->bulkToggleable(),
 
                         Actions::make([
                             Action::make('treatmentSurgery')
@@ -149,9 +148,11 @@ class PatientFollowUpFormForm
                                         ->schema(self::surgery()),
                                 ])
                                 ->fillForm(fn (Get $get): array => [
-
+                                    'surgeries' => $get('surgeries') ?? [],
                                 ])
-                                ->action(function (array $data, Set $set): void {}),
+                                ->action(function (array $data, Set $set): void {
+                                    $set('surgeries', $data['surgeries'] ?? []);
+                                }),
 
                             Action::make('treatmentAntiCancerDrugTherapy')
                                 ->label('Add Anti-Cancer Drug Therapy')
@@ -165,9 +166,11 @@ class PatientFollowUpFormForm
                                         ->schema(self::antiCancer()),
                                 ])
                                 ->fillForm(fn (Get $get): array => [
-
+                                    'anti_cancer_drug_therapies' => $get('anti_cancer_drug_therapies') ?? [],
                                 ])
-                                ->action(function (array $data, Set $set): void {}),
+                                ->action(function (array $data, Set $set): void {
+                                    $set('anti_cancer_drug_therapies', $data['anti_cancer_drug_therapies'] ?? []);
+                                }),
 
                             Action::make('treatmentRadiotherapy')
                                 ->label('Add Radiotherapy')
@@ -181,10 +184,10 @@ class PatientFollowUpFormForm
                                         ->schema(self::radiotherapyRepeaterSchema()),
                                 ])
                                 ->fillForm(fn (Get $get): array => [
-
+                                    'radiotherapies' => $get('radiotherapies') ?? [],
                                 ])
                                 ->action(function (array $data, Set $set): void {
-
+                                    $set('radiotherapies', $data['radiotherapies'] ?? []);
                                 }),
 
                             Action::make('treatmentTheranostics')
@@ -195,11 +198,13 @@ class PatientFollowUpFormForm
                                 ->modalSubmitActionLabel('Save')
                                 ->form([
                                     Section::make('THERANOSTICS')
-                                    ->schema(self::theranosticsRepeaterSchema())
+                                        ->schema(self::theranosticsRepeaterSchema()),
                                 ])
                                 ->fillForm(fn (Get $get): array => [
+                                    'theranostics' => $get('theranostics') ?? [],
                                 ])
                                 ->action(function (array $data, Set $set): void {
+                                    $set('theranostics', $data['theranostics'] ?? []);
                                 }),
 
                             Action::make('treatmentPalliativeCare')
@@ -215,8 +220,10 @@ class PatientFollowUpFormForm
                                         ->columnSpanFull(),
                                 ])
                                 ->fillForm(fn (Get $get): array => [
+                                    'palliative_cares' => $get('palliative_cares') ?? [],
                                 ])
                                 ->action(function (array $data, Set $set): void {
+                                    $set('palliative_cares', $data['palliative_cares'] ?? []);
                                 }),
 
                             Action::make('treatmentOtherTreatments')
@@ -232,12 +239,10 @@ class PatientFollowUpFormForm
                                         ->columnSpanFull(),
                                 ])
                                 ->fillForm(fn (Get $get): array => [
-                                    'details' => $get('other_treatments_details'),
-                                    'notes' => $get('other_treatments_notes'),
+                                    'other_cancer_directed_therapies' => $get('other_cancer_directed_therapies') ?? [],
                                 ])
                                 ->action(function (array $data, Set $set): void {
-                                    $set('other_treatments_details', $data['details']);
-                                    $set('other_treatments_notes', $data['notes'] ?? null);
+                                    $set('other_cancer_directed_therapies', $data['other_cancer_directed_therapies'] ?? []);
                                 }),
                         ])->columnSpanFull(),
                     ]),
@@ -459,68 +464,67 @@ class PatientFollowUpFormForm
     /**
      * @return array<int, mixed>
      */
-
     private static function surgery(): array
     {
         return [
             Repeater::make('surgeries')
-            ->label(false)
-            ->addActionLabel('Add another surgery')
-            ->defaultItems(1)
-            ->minItems(1)
-            ->columns(4)
-            ->schema([
-                DatePicker::make('surgery_date')
-                    ->label('Surgery Date')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 2,
-                    ]),
+                ->label(false)
+                ->addActionLabel('Add another surgery')
+                ->defaultItems(1)
+                ->minItems(1)
+                ->columns(4)
+                ->schema([
+                    DatePicker::make('surgery_date')
+                        ->label('Surgery Date')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 2,
+                        ]),
 
-                TextInput::make('surgery_rvs_code')
-                    ->label('Surgery Type / RVS Code')
-                    ->maxLength(100)
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 2,
-                    ]),
+                    TextInput::make('surgery_rvs_code')
+                        ->label('Surgery Type / RVS Code')
+                        ->maxLength(100)
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 2,
+                        ]),
 
-                TextInput::make('surgery_description')
-                    ->label('Surgery Description')
-                    ->placeholder('Example: Enucleation of the Right Eye')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 2,
-                    ]),
+                    TextInput::make('surgery_description')
+                        ->label('Surgery Description')
+                        ->placeholder('Example: Enucleation of the Right Eye')
+                        ->required()
+                        ->maxLength(255)
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 2,
+                        ]),
 
-                Select::make('surgery_goal')
-                    ->label('Goal of Surgery')
-                    ->options([
-                        'Definitive' => 'Definitive',
-                        'Debulking' => 'Debulking',
-                        'Diagnostic' => 'Diagnostic',
-                        'Reconstructive' => 'Reconstructive',
-                        'Palliative' => 'Palliative',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 2,
-                    ]),
-            ]),
-                                        
+                    Select::make('surgery_goal')
+                        ->label('Goal of Surgery')
+                        ->options([
+                            'Definitive' => 'Definitive',
+                            'Debulking' => 'Debulking',
+                            'Diagnostic' => 'Diagnostic',
+                            'Reconstructive' => 'Reconstructive',
+                            'Palliative' => 'Palliative',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 2,
+                        ]),
+                ]),
+
         ];
     }
 
-    private static function antiCancer(): array 
+    private static function antiCancer(): array
     {
         return [
 
@@ -666,301 +670,301 @@ class PatientFollowUpFormForm
         return [
 
             Repeater::make('radiotherapies')
-            ->label(false)
-            ->addActionLabel('Add another radiotherapy')
-            ->defaultItems(1)
-            ->minItems(1)
-            ->columns([
-                'default' => 1,
-                'lg' => 4,
-            ])
-            ->schema([
-                DatePicker::make('date_started')
-                ->label('Date Started')
-                ->native(false)
-                ->displayFormat('Y-m-d')
-                ->required()
-                ->columnSpan([
+                ->label(false)
+                ->addActionLabel('Add another radiotherapy')
+                ->defaultItems(1)
+                ->minItems(1)
+                ->columns([
                     'default' => 1,
-                    'lg' => 2,
-                ]),
-
-            DatePicker::make('date_ended')
-                ->label('Date Ended')
-                ->native(false)
-                ->displayFormat('Y-m-d')
-                ->required()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
-
-            TextInput::make('total_planned_dose')
-                ->label('Total Planned Dose')
-                ->numeric()
-                ->minValue(0)
-                ->step(0.01)
-                ->suffix('Gy')
-                ->required()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
-
-            TextInput::make('total_delivered_fraction')
-                ->label('Total Delivered Fraction')
-                ->numeric()
-                ->minValue(0)
-                ->step(1)
-                ->required()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
-
-            TextInput::make('dose_per_fraction')
-                ->label('Dose Per Fraction')
-                ->numeric()
-                ->minValue(0)
-                ->step(0.01)
-                ->suffix('Gy')
-                ->required()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
-
-            TextInput::make('total_number_of_days')
-                ->label('Total Number of Days')
-                ->numeric()
-                ->minValue(0)
-                ->step(1)
-                ->required()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
-
-            Select::make('radiotherapy_type')
-                ->label('Type of Radiotherapy')
-                ->options([
-                    'External beam radiotherapy' => 'External beam radiotherapy',
-                    'Brachytherapy' => 'Brachytherapy',
-                    'Systemic radiotherapy' => 'Systemic radiotherapy',
-                    'Others' => 'Others',
+                    'lg' => 4,
                 ])
-                ->native(false)
-                ->searchable()
-                ->required()
-                ->live()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
+                ->schema([
+                    DatePicker::make('date_started')
+                        ->label('Date Started')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
 
-            TextInput::make('radiotherapy_type_specifics')
-                ->label('Type Specifics')
-                ->maxLength(255)
-                ->required(fn (Get $get): bool => $get('radiotherapy_type') === 'Others')
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
+                    DatePicker::make('date_ended')
+                        ->label('Date Ended')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
 
-            Select::make('target_site')
-                ->label('Target Site of Radiotherapy')
-                ->options([
-                    'Primary site' => 'Primary site',
-                    'Regional lymph node' => 'Regional lymph node',
-                    'Distant metastasis' => 'Distant metastasis',
-                    'Central nervous system' => 'Central nervous system',
-                    'Bone' => 'Bone',
-                    'Others' => 'Others',
-                ])
-                ->native(false)
-                ->searchable()
-                ->required()
-                ->live()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
+                    TextInput::make('total_planned_dose')
+                        ->label('Total Planned Dose')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(0.01)
+                        ->suffix('Gy')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
 
-            TextInput::make('target_site_specifics')
-                ->label('Target Site Specifics')
-                ->maxLength(255)
-                ->required(fn (Get $get): bool => $get('target_site') === 'Others')
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
+                    TextInput::make('total_delivered_fraction')
+                        ->label('Total Delivered Fraction')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(1)
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
 
-            Select::make('goal_of_radiotherapy')
-                ->label('Goal of Radiotherapy')
-                ->options([
-                    'Curative' => 'Curative',
-                    'Palliative' => 'Palliative',
-                    'Others' => 'Others',
-                ])
-                ->native(false)
-                ->searchable()
-                ->required()
-                ->live()
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
-                ]),
+                    TextInput::make('dose_per_fraction')
+                        ->label('Dose Per Fraction')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(0.01)
+                        ->suffix('Gy')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
 
-            TextInput::make('goal_other')
-                ->label('Goal Other Specify')
-                ->maxLength(255)
-                ->visible(fn (Get $get): bool => $get('goal_of_radiotherapy') === 'Others')
-                ->required(fn (Get $get): bool => $get('goal_of_radiotherapy') === 'Others')
-                ->columnSpan([
-                    'default' => 1,
-                    'lg' => 2,
+                    TextInput::make('total_number_of_days')
+                        ->label('Total Number of Days')
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(1)
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
+
+                    Select::make('radiotherapy_type')
+                        ->label('Type of Radiotherapy')
+                        ->options([
+                            'External beam radiotherapy' => 'External beam radiotherapy',
+                            'Brachytherapy' => 'Brachytherapy',
+                            'Systemic radiotherapy' => 'Systemic radiotherapy',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
+
+                    TextInput::make('radiotherapy_type_specifics')
+                        ->label('Type Specifics')
+                        ->maxLength(255)
+                        ->required(fn (Get $get): bool => $get('radiotherapy_type') === 'Others')
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
+
+                    Select::make('target_site')
+                        ->label('Target Site of Radiotherapy')
+                        ->options([
+                            'Primary site' => 'Primary site',
+                            'Regional lymph node' => 'Regional lymph node',
+                            'Distant metastasis' => 'Distant metastasis',
+                            'Central nervous system' => 'Central nervous system',
+                            'Bone' => 'Bone',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
+
+                    TextInput::make('target_site_specifics')
+                        ->label('Target Site Specifics')
+                        ->maxLength(255)
+                        ->required(fn (Get $get): bool => $get('target_site') === 'Others')
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
+
+                    Select::make('goal_of_radiotherapy')
+                        ->label('Goal of Radiotherapy')
+                        ->options([
+                            'Curative' => 'Curative',
+                            'Palliative' => 'Palliative',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
+
+                    TextInput::make('goal_other')
+                        ->label('Goal Other Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => $get('goal_of_radiotherapy') === 'Others')
+                        ->required(fn (Get $get): bool => $get('goal_of_radiotherapy') === 'Others')
+                        ->columnSpan([
+                            'default' => 1,
+                            'lg' => 2,
+                        ]),
                 ]),
-            ]),
         ];
     }
 
     private static function theranosticsRepeaterSchema(): array
     {
         return [
-            Repeater::make('anti_cancer_drug_therapies')
-            ->label(false)
-            ->addActionLabel('Add Anti-Cancer Drug Therapy')
-            ->defaultItems(1)
-            ->minItems(1)
-            ->columns(2)
-            ->schema([
-                DatePicker::make('date_started')
-                    ->label('Date Started')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+            Repeater::make('theranostics')
+                ->label(false)
+                ->addActionLabel('Add Anti-Cancer Drug Therapy')
+                ->defaultItems(1)
+                ->minItems(1)
+                ->columns(2)
+                ->schema([
+                    DatePicker::make('date_started')
+                        ->label('Date Started')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                DatePicker::make('date_last_anti_cancer_drug_therapy')
-                    ->label('Date of Last Anti-Cancer Drug Therapy')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    DatePicker::make('date_last_anti_cancer_drug_therapy')
+                        ->label('Date of Last Anti-Cancer Drug Therapy')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                Textarea::make('drugs_given')
-                    ->label('Drugs Given')
-                    ->placeholder('Example: Methotrexate, Dexamethasone, Peg Asparaginase, Vincristine, Idarubicin')
-                    ->rows(2)
-                    ->required()
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    Textarea::make('drugs_given')
+                        ->label('Drugs Given')
+                        ->placeholder('Example: Methotrexate, Dexamethasone, Peg Asparaginase, Vincristine, Idarubicin')
+                        ->rows(2)
+                        ->required()
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                Select::make('drug_types')
-                    ->label('Drug Type/s')
-                    ->multiple()
-                    ->options([
-                        'Cytotoxic' => 'Cytotoxic',
-                        'Hormonal' => 'Hormonal',
-                        'Immunotherapy' => 'Immunotherapy',
-                        'Targeted Therapy' => 'Targeted Therapy',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    Select::make('drug_types')
+                        ->label('Drug Type/s')
+                        ->multiple()
+                        ->options([
+                            'Cytotoxic' => 'Cytotoxic',
+                            'Hormonal' => 'Hormonal',
+                            'Immunotherapy' => 'Immunotherapy',
+                            'Targeted Therapy' => 'Targeted Therapy',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('drug_type_other')
-                    ->label('Drug Type Other Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => in_array('Others', $get('drug_types') ?? []))
-                    ->required(fn (Get $get): bool => in_array('Others', $get('drug_types') ?? []))
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    TextInput::make('drug_type_other')
+                        ->label('Drug Type Other Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => in_array('Others', $get('drug_types') ?? []))
+                        ->required(fn (Get $get): bool => in_array('Others', $get('drug_types') ?? []))
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                Select::make('treatment_phase')
-                    ->label('Treatment Phase')
-                    ->options([
-                        'Induction' => 'Induction',
-                        'Consolidation' => 'Consolidation',
-                        'Maintenance' => 'Maintenance',
-                        'Neoadjuvant' => 'Neoadjuvant',
-                        'Adjuvant' => 'Adjuvant',
-                        'Palliative' => 'Palliative',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    Select::make('treatment_phase')
+                        ->label('Treatment Phase')
+                        ->options([
+                            'Induction' => 'Induction',
+                            'Consolidation' => 'Consolidation',
+                            'Maintenance' => 'Maintenance',
+                            'Neoadjuvant' => 'Neoadjuvant',
+                            'Adjuvant' => 'Adjuvant',
+                            'Palliative' => 'Palliative',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('treatment_phase_other')
-                    ->label('Treatment Phase Other Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => $get('treatment_phase') === 'Others')
-                    ->required(fn (Get $get): bool => $get('treatment_phase') === 'Others')
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    TextInput::make('treatment_phase_other')
+                        ->label('Treatment Phase Other Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => $get('treatment_phase') === 'Others')
+                        ->required(fn (Get $get): bool => $get('treatment_phase') === 'Others')
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('cycle_no')
-                    ->label('Cycle No')
-                    ->numeric()
-                    ->minValue(1)
-                    ->required()
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    TextInput::make('cycle_no')
+                        ->label('Cycle No')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required()
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                Select::make('goal_of_anti_cancer_drug_therapy')
-                    ->label('Goal of Anti-Cancer Drug Therapy')
-                    ->options([
-                        'Curative' => 'Curative',
-                        'Palliative' => 'Palliative',
-                        'Control' => 'Control',
-                        'Supportive' => 'Supportive',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
+                    Select::make('goal_of_anti_cancer_drug_therapy')
+                        ->label('Goal of Anti-Cancer Drug Therapy')
+                        ->options([
+                            'Curative' => 'Curative',
+                            'Palliative' => 'Palliative',
+                            'Control' => 'Control',
+                            'Supportive' => 'Supportive',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('goal_other')
-                    ->label('Goal Other Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => $get('goal_of_anti_cancer_drug_therapy') === 'Others')
-                    ->required(fn (Get $get): bool => $get('goal_of_anti_cancer_drug_therapy') === 'Others')
-                    ->columnSpan([
-                        'default' => 2,
-                        'md' => 1,
-                    ]),
-            ])
+                    TextInput::make('goal_other')
+                        ->label('Goal Other Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => $get('goal_of_anti_cancer_drug_therapy') === 'Others')
+                        ->required(fn (Get $get): bool => $get('goal_of_anti_cancer_drug_therapy') === 'Others')
+                        ->columnSpan([
+                            'default' => 2,
+                            'md' => 1,
+                        ]),
+                ]),
         ];
     }
 
@@ -968,202 +972,202 @@ class PatientFollowUpFormForm
     {
         return [
             Repeater::make('palliative_cares')
-            ->label(false)
-            ->addActionLabel('Add Palliative Care')
-            ->defaultItems(1)
-            ->minItems(1)
-            ->columns(2)
-            ->schema([
-                DatePicker::make('date_started')
-                    ->label('Date Started')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                ->label(false)
+                ->addActionLabel('Add Palliative Care')
+                ->defaultItems(1)
+                ->minItems(1)
+                ->columns(2)
+                ->schema([
+                    DatePicker::make('date_started')
+                        ->label('Date Started')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                DatePicker::make('date_last_palliative_care')
-                    ->label('Date of Last Palliative Care')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    DatePicker::make('date_last_palliative_care')
+                        ->label('Date of Last Palliative Care')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                Select::make('reasons')
-                    ->label('Reason/s')
-                    ->helperText('Can be multiple.')
-                    ->multiple()
-                    ->options([
-                        'Pain Control' => 'Pain Control',
-                        'Symptom Control' => 'Symptom Control',
-                        'Psychosocial Support' => 'Psychosocial Support',
-                        'End-of-Life Care' => 'End-of-Life Care',
-                        'Nutritional Support' => 'Nutritional Support',
-                        'Spiritual Care' => 'Spiritual Care',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    Select::make('reasons')
+                        ->label('Reason/s')
+                        ->helperText('Can be multiple.')
+                        ->multiple()
+                        ->options([
+                            'Pain Control' => 'Pain Control',
+                            'Symptom Control' => 'Symptom Control',
+                            'Psychosocial Support' => 'Psychosocial Support',
+                            'End-of-Life Care' => 'End-of-Life Care',
+                            'Nutritional Support' => 'Nutritional Support',
+                            'Spiritual Care' => 'Spiritual Care',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('reason_specifics')
-                    ->label('Specifics / Others, Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => in_array('Others', $get('reasons') ?? []))
-                    ->required(fn (Get $get): bool => in_array('Others', $get('reasons') ?? []))
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    TextInput::make('reason_specifics')
+                        ->label('Specifics / Others, Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => in_array('Others', $get('reasons') ?? []))
+                        ->required(fn (Get $get): bool => in_array('Others', $get('reasons') ?? []))
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                Select::make('type_of_care_integration')
-                    ->label('Type of Care Integration')
-                    ->options([
-                        'Concurrent-Curative' => 'Concurrent-Curative',
-                        'Concurrent-Palliative' => 'Concurrent-Palliative',
-                        'Palliative Only' => 'Palliative Only',
-                        'End-of-Life Care' => 'End-of-Life Care',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    Select::make('type_of_care_integration')
+                        ->label('Type of Care Integration')
+                        ->options([
+                            'Concurrent-Curative' => 'Concurrent-Curative',
+                            'Concurrent-Palliative' => 'Concurrent-Palliative',
+                            'Palliative Only' => 'Palliative Only',
+                            'End-of-Life Care' => 'End-of-Life Care',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('type_of_care_integration_other')
-                    ->label('Type of Care Integration Other Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => $get('type_of_care_integration') === 'Others')
-                    ->required(fn (Get $get): bool => $get('type_of_care_integration') === 'Others')
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    TextInput::make('type_of_care_integration_other')
+                        ->label('Type of Care Integration Other Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => $get('type_of_care_integration') === 'Others')
+                        ->required(fn (Get $get): bool => $get('type_of_care_integration') === 'Others')
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                Select::make('goal_of_care')
-                    ->label('Goal of Care')
-                    ->options([
-                        'Curative' => 'Curative',
-                        'Palliative' => 'Palliative',
-                        'Supportive' => 'Supportive',
-                        'Comfort Care' => 'Comfort Care',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    Select::make('goal_of_care')
+                        ->label('Goal of Care')
+                        ->options([
+                            'Curative' => 'Curative',
+                            'Palliative' => 'Palliative',
+                            'Supportive' => 'Supportive',
+                            'Comfort Care' => 'Comfort Care',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('goal_of_care_other')
-                    ->label('Goal of Care Other Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => $get('goal_of_care') === 'Others')
-                    ->required(fn (Get $get): bool => $get('goal_of_care') === 'Others')
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
-            ])
+                    TextInput::make('goal_of_care_other')
+                        ->label('Goal of Care Other Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => $get('goal_of_care') === 'Others')
+                        ->required(fn (Get $get): bool => $get('goal_of_care') === 'Others')
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
+                ]),
         ];
     }
 
-    private static function otherTreatmentsSchema(): array 
+    private static function otherTreatmentsSchema(): array
     {
         return [
             Repeater::make('other_cancer_directed_therapies')
-            ->label(false)
-            ->addActionLabel('Add Other Cancer-Directed Therapy')
-            ->defaultItems(1)
-            ->minItems(1)
-            ->columns(2)
-            ->schema([
-                DatePicker::make('date_of_therapy')
-                    ->label('Date of Therapy')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                ->label(false)
+                ->addActionLabel('Add Other Cancer-Directed Therapy')
+                ->defaultItems(1)
+                ->minItems(1)
+                ->columns(2)
+                ->schema([
+                    DatePicker::make('date_of_therapy')
+                        ->label('Date of Therapy')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                Select::make('type_of_cancer_directed_therapy')
-                    ->label('Type of Cancer-Directed Therapy')
-                    ->options([
-                        'Targeted Therapy' => 'Targeted Therapy',
-                        'Immunotherapy' => 'Immunotherapy',
-                        'Hormonal Therapy' => 'Hormonal Therapy',
-                        'Stem Cell Transplant' => 'Stem Cell Transplant',
-                        'Gene Therapy' => 'Gene Therapy',
-                        'Ablation Therapy' => 'Ablation Therapy',
-                        'Photodynamic Therapy' => 'Photodynamic Therapy',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    Select::make('type_of_cancer_directed_therapy')
+                        ->label('Type of Cancer-Directed Therapy')
+                        ->options([
+                            'Targeted Therapy' => 'Targeted Therapy',
+                            'Immunotherapy' => 'Immunotherapy',
+                            'Hormonal Therapy' => 'Hormonal Therapy',
+                            'Stem Cell Transplant' => 'Stem Cell Transplant',
+                            'Gene Therapy' => 'Gene Therapy',
+                            'Ablation Therapy' => 'Ablation Therapy',
+                            'Photodynamic Therapy' => 'Photodynamic Therapy',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('type_of_cancer_directed_therapy_other')
-                    ->label('Other Cancer-Directed Therapy, Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => $get('type_of_cancer_directed_therapy') === 'Others')
-                    ->required(fn (Get $get): bool => $get('type_of_cancer_directed_therapy') === 'Others')
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    TextInput::make('type_of_cancer_directed_therapy_other')
+                        ->label('Other Cancer-Directed Therapy, Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => $get('type_of_cancer_directed_therapy') === 'Others')
+                        ->required(fn (Get $get): bool => $get('type_of_cancer_directed_therapy') === 'Others')
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                Select::make('goal_of_cancer_directed_therapy')
-                    ->label('Goal of Cancer-Directed Therapy')
-                    ->options([
-                        'Curative' => 'Curative',
-                        'Palliative' => 'Palliative',
-                        'Control' => 'Control',
-                        'Supportive' => 'Supportive',
-                        'Others' => 'Others',
-                    ])
-                    ->native(false)
-                    ->searchable()
-                    ->required()
-                    ->live()
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
+                    Select::make('goal_of_cancer_directed_therapy')
+                        ->label('Goal of Cancer-Directed Therapy')
+                        ->options([
+                            'Curative' => 'Curative',
+                            'Palliative' => 'Palliative',
+                            'Control' => 'Control',
+                            'Supportive' => 'Supportive',
+                            'Others' => 'Others',
+                        ])
+                        ->native(false)
+                        ->searchable()
+                        ->required()
+                        ->live()
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
 
-                TextInput::make('goal_of_cancer_directed_therapy_other')
-                    ->label('Goal Other Specify')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => $get('goal_of_cancer_directed_therapy') === 'Others')
-                    ->required(fn (Get $get): bool => $get('goal_of_cancer_directed_therapy') === 'Others')
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 1,
-                    ]),
-            ])
+                    TextInput::make('goal_of_cancer_directed_therapy_other')
+                        ->label('Goal Other Specify')
+                        ->maxLength(255)
+                        ->visible(fn (Get $get): bool => $get('goal_of_cancer_directed_therapy') === 'Others')
+                        ->required(fn (Get $get): bool => $get('goal_of_cancer_directed_therapy') === 'Others')
+                        ->columnSpan([
+                            'default' => 1,
+                            'md' => 1,
+                        ]),
+                ]),
         ];
     }
 }

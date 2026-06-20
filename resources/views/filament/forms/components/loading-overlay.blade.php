@@ -17,7 +17,7 @@
     class="fi-treatment-plan-busy-overlay"
 >
     <div class="fi-loading-box">
-        <svg
+        {{-- <svg
             aria-hidden="true"
             class="fi-loading-spinner"
             viewBox="0 0 100 101"
@@ -36,6 +36,6 @@
 
         <span class="fi-loading-text">
             Loading Please Wait...
-        </span>
+        </span> --}}
     </div>
 </div>

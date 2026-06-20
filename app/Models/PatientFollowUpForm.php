@@ -3,11 +3,68 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 
 class PatientFollowUpForm extends Model
 {
     use SoftDeletes;
+
+    private const SURGERY_RECORD_COLUMNS = [
+        'surgery_date',
+        'surgery_rvs_code',
+        'surgery_description',
+        'surgery_goal',
+    ];
+
+    private const ANTI_CANCER_DRUG_THERAPY_RECORD_COLUMNS = [
+        'date_started',
+        'date_last_anti_cancer_drug_therapy',
+        'drugs_given',
+        'drug_types',
+        'drug_type_other',
+        'treatment_phase',
+        'treatment_phase_other',
+        'cycle_no',
+        'goal_of_anti_cancer_drug_therapy',
+        'goal_other',
+    ];
+
+    private const RADIOTHERAPY_RECORD_COLUMNS = [
+        'date_started',
+        'date_ended',
+        'total_planned_dose',
+        'total_delivered_fraction',
+        'dose_per_fraction',
+        'total_number_of_days',
+        'radiotherapy_type',
+        'radiotherapy_type_specifics',
+        'target_site',
+        'target_site_specifics',
+        'goal_of_radiotherapy',
+        'goal_other',
+    ];
+
+    private const PALLIATIVE_CARE_RECORD_COLUMNS = [
+        'date_started',
+        'date_last_palliative_care',
+        'reasons',
+        'reason_specifics',
+        'type_of_care_integration',
+        'type_of_care_integration_other',
+        'goal_of_care',
+        'goal_of_care_other',
+    ];
+
+    private const OTHER_CANCER_DIRECTED_THERAPY_RECORD_COLUMNS = [
+        'date_of_therapy',
+        'type_of_cancer_directed_therapy',
+        'type_of_cancer_directed_therapy_other',
+        'goal_of_cancer_directed_therapy',
+        'goal_of_cancer_directed_therapy_other',
+    ];
 
     protected $fillable = [
         'form_demographic_id',
@@ -51,8 +108,174 @@ class PatientFollowUpForm extends Model
         'financial_support_mechanisms' => 'array',
     ];
 
-    public function formDemographic()
+    public function formDemographic(): BelongsTo
     {
         return $this->belongsTo(FormDemographics::class, 'form_demographic_id');
+    }
+
+    public function surgeryRecords(): HasMany
+    {
+        return $this->hasMany(PatientFollowUpFormSurgery::class);
+    }
+
+    public function antiCancerDrugTherapyRecords(): HasMany
+    {
+        return $this->hasMany(PatientFollowUpFormAntiCancerDrugTherapy::class);
+    }
+
+    public function radiotherapyRecords(): HasMany
+    {
+        return $this->hasMany(PatientFollowUpFormRadiotherapy::class);
+    }
+
+    public function theranosticRecords(): HasMany
+    {
+        return $this->hasMany(PatientFollowUpFormTheranostic::class);
+    }
+
+    public function palliativeCareRecords(): HasMany
+    {
+        return $this->hasMany(PatientFollowUpFormPalliativeCare::class);
+    }
+
+    public function otherCancerDirectedTherapyRecords(): HasMany
+    {
+        return $this->hasMany(PatientFollowUpFormOtherCancerDirectedTherapy::class);
+    }
+
+    /**
+     * @param  array<string, mixed>  $treatmentRecords
+     */
+    public function syncTreatmentRecords(array $treatmentRecords): void
+    {
+        $this->syncHasManyRecords(
+            $this->surgeryRecords(),
+            $this->selectedTreatmentRecords($treatmentRecords, 'surgeries', 'Surgery'),
+            self::SURGERY_RECORD_COLUMNS,
+        );
+
+        $this->syncHasManyRecords(
+            $this->antiCancerDrugTherapyRecords(),
+            $this->selectedTreatmentRecords(
+                $treatmentRecords,
+                'anti_cancer_drug_therapies',
+                'Anti-cancer drug therapy',
+            ),
+            self::ANTI_CANCER_DRUG_THERAPY_RECORD_COLUMNS,
+        );
+
+        $this->syncHasManyRecords(
+            $this->radiotherapyRecords(),
+            $this->selectedTreatmentRecords($treatmentRecords, 'radiotherapies', 'Radiotherapy'),
+            self::RADIOTHERAPY_RECORD_COLUMNS,
+        );
+
+        $this->syncHasManyRecords(
+            $this->theranosticRecords(),
+            $this->selectedTreatmentRecords($treatmentRecords, 'theranostics', 'Theranostics'),
+            self::ANTI_CANCER_DRUG_THERAPY_RECORD_COLUMNS,
+        );
+
+        $this->syncHasManyRecords(
+            $this->palliativeCareRecords(),
+            $this->selectedTreatmentRecords($treatmentRecords, 'palliative_cares', 'Palliative Care'),
+            self::PALLIATIVE_CARE_RECORD_COLUMNS,
+        );
+
+        $this->syncHasManyRecords(
+            $this->otherCancerDirectedTherapyRecords(),
+            $this->selectedTreatmentRecords(
+                $treatmentRecords,
+                'other_cancer_directed_therapies',
+                'Other Treatments',
+            ),
+            self::OTHER_CANCER_DIRECTED_THERAPY_RECORD_COLUMNS,
+        );
+    }
+
+    /**
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    public function treatmentRecordsForForm(): array
+    {
+        $this->loadMissing([
+            'surgeryRecords',
+            'antiCancerDrugTherapyRecords',
+            'radiotherapyRecords',
+            'theranosticRecords',
+            'palliativeCareRecords',
+            'otherCancerDirectedTherapyRecords',
+        ]);
+
+        return [
+            'surgeries' => $this->recordsForForm($this->surgeryRecords, self::SURGERY_RECORD_COLUMNS),
+            'anti_cancer_drug_therapies' => $this->recordsForForm(
+                $this->antiCancerDrugTherapyRecords,
+                self::ANTI_CANCER_DRUG_THERAPY_RECORD_COLUMNS,
+            ),
+            'radiotherapies' => $this->recordsForForm($this->radiotherapyRecords, self::RADIOTHERAPY_RECORD_COLUMNS),
+            'theranostics' => $this->recordsForForm(
+                $this->theranosticRecords,
+                self::ANTI_CANCER_DRUG_THERAPY_RECORD_COLUMNS,
+            ),
+            'palliative_cares' => $this->recordsForForm($this->palliativeCareRecords, self::PALLIATIVE_CARE_RECORD_COLUMNS),
+            'other_cancer_directed_therapies' => $this->recordsForForm(
+                $this->otherCancerDirectedTherapyRecords,
+                self::OTHER_CANCER_DIRECTED_THERAPY_RECORD_COLUMNS,
+            ),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $treatmentRecords
+     * @return array<int, array<string, mixed>>
+     */
+    private function selectedTreatmentRecords(array $treatmentRecords, string $stateKey, string $procedure): array
+    {
+        if (
+            array_key_exists('procedures_administered', $treatmentRecords) &&
+            ! in_array($procedure, Arr::wrap($treatmentRecords['procedures_administered']), true)
+        ) {
+            return [];
+        }
+
+        $records = $treatmentRecords[$stateKey] ?? [];
+
+        return is_array($records) ? $records : [];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $records
+     * @param  array<int, string>  $columns
+     */
+    private function syncHasManyRecords(HasMany $relationship, array $records, array $columns): void
+    {
+        $relationship->delete();
+
+        $records = collect($records)
+            ->filter(fn (mixed $record): bool => is_array($record))
+            ->map(fn (array $record): array => Arr::only($record, $columns))
+            ->filter(fn (array $record): bool => collect($record)->contains(fn (mixed $value): bool => filled($value)))
+            ->values()
+            ->all();
+
+        if ($records === []) {
+            return;
+        }
+
+        $relationship->createMany($records);
+    }
+
+    /**
+     * @param  iterable<int, Model>  $records
+     * @param  array<int, string>  $columns
+     * @return array<int, array<string, mixed>>
+     */
+    private function recordsForForm(iterable $records, array $columns): array
+    {
+        return collect($records)
+            ->map(fn (Model $record): array => Arr::only($record->attributesToArray(), $columns))
+            ->values()
+            ->all();
     }
 }
