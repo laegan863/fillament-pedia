@@ -3,6 +3,391 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 
+.fi-registry-dashboard {
+    --registry-surface: #ffffff;
+    --registry-surface-muted: #f8fafc;
+    --registry-border: rgba(15, 23, 42, 0.1);
+    --registry-border-strong: rgba(15, 23, 42, 0.14);
+    --registry-text: #111827;
+    --registry-muted: #6b7280;
+    --registry-faint: #f1f5f9;
+    --registry-primary: #d97706;
+    --registry-primary-soft: #fffbeb;
+    --registry-info: #2563eb;
+    --registry-success: #059669;
+    --registry-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.dark .fi-registry-dashboard {
+    --registry-surface: #111827;
+    --registry-surface-muted: rgba(255, 255, 255, 0.04);
+    --registry-border: rgba(255, 255, 255, 0.1);
+    --registry-border-strong: rgba(255, 255, 255, 0.16);
+    --registry-text: #f9fafb;
+    --registry-muted: #9ca3af;
+    --registry-faint: rgba(255, 255, 255, 0.08);
+    --registry-primary-soft: rgba(217, 119, 6, 0.12);
+    --registry-shadow: 0 1px 2px rgba(0, 0, 0, 0.28), 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+
+.fi-registry-dashboard__layout {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.fi-registry-panel,
+.fi-registry-empty {
+    border: 1px solid var(--registry-border);
+    border-radius: 0.75rem;
+    background: var(--registry-surface);
+    box-shadow: var(--registry-shadow);
+}
+
+.fi-registry-panel {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.fi-registry-panel__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--registry-border);
+    background: linear-gradient(180deg, var(--registry-surface), var(--registry-surface-muted));
+    padding: 1rem 1.25rem;
+}
+
+.fi-registry-panel__title,
+.fi-registry-empty__title {
+    margin: 0;
+    color: var(--registry-text);
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.fi-registry-panel__title {
+    font-size: 1rem;
+}
+
+.fi-registry-panel__description {
+    margin: 0.25rem 0 0;
+    color: var(--registry-muted);
+    font-size: 0.875rem;
+    line-height: 1.45;
+}
+
+.fi-registry-panel__action {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.fi-registry-bar-chart {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+}
+
+.fi-registry-bar-chart__svg {
+    display: block;
+    width: 100%;
+    min-height: 18rem;
+    border: 1px solid var(--registry-border);
+    border-radius: 0.75rem;
+    background: var(--registry-surface-muted);
+}
+
+.fi-registry-bar-chart__grid {
+    stroke: var(--registry-border);
+    stroke-width: 1;
+}
+
+.fi-registry-bar-chart__axis {
+    stroke: var(--registry-border-strong);
+    stroke-width: 1.5;
+}
+
+.fi-registry-bar-chart__tick,
+.fi-registry-bar-chart__label {
+    fill: var(--registry-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+
+.fi-registry-bar-chart__track {
+    fill: var(--registry-faint);
+}
+
+.fi-registry-bar-chart__bar {
+    filter: drop-shadow(0 6px 8px rgba(15, 23, 42, 0.16));
+}
+
+.fi-registry-bar-chart__value {
+    fill: var(--registry-text);
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.fi-registry-bar-chart__legend {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.fi-registry-chart-legend-item {
+    display: flex;
+    gap: 0.75rem;
+    min-width: 0;
+    border: 1px solid var(--registry-border);
+    border-radius: 0.75rem;
+    background: var(--registry-surface-muted);
+    padding: 0.875rem;
+}
+
+.fi-registry-chart-legend-item__marker {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.fi-registry-chart-legend-item__text {
+    display: grid;
+    min-width: 0;
+    gap: 0.2rem;
+}
+
+.fi-registry-chart-legend-item__text span {
+    color: var(--registry-muted);
+    font-size: 0.75rem;
+    font-weight: 650;
+    text-transform: uppercase;
+}
+
+.fi-registry-chart-legend-item__text strong {
+    color: var(--registry-text);
+    font-size: 0.875rem;
+    font-weight: 650;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.fi-registry-pie-chart {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+}
+
+.fi-registry-pie-chart__visual {
+    position: relative;
+    display: grid;
+    width: min(17rem, 100%);
+    aspect-ratio: 1;
+    place-items: center;
+}
+
+.fi-registry-pie-chart__svg {
+    width: 100%;
+    height: 100%;
+}
+
+.fi-registry-pie-chart__track {
+    fill: none;
+    stroke: var(--registry-faint);
+    stroke-width: 7;
+}
+
+.fi-registry-pie-chart__segment {
+    fill: none;
+    stroke-width: 7;
+    stroke-linecap: butt;
+}
+
+.fi-registry-pie-chart__center {
+    position: absolute;
+    display: grid;
+    width: 7rem;
+    height: 7rem;
+    place-items: center;
+    align-content: center;
+    border: 1px solid var(--registry-border);
+    border-radius: 999px;
+    background: var(--registry-surface);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.fi-registry-pie-chart__center strong {
+    color: var(--registry-text);
+    font-size: 1.65rem;
+    font-weight: 750;
+    line-height: 1;
+}
+
+.fi-registry-pie-chart__center span {
+    margin-top: 0.25rem;
+    color: var(--registry-muted);
+    font-size: 0.75rem;
+    font-weight: 650;
+}
+
+.fi-registry-pie-chart__legend,
+.fi-registry-follow-ups {
+    display: grid;
+}
+
+.fi-registry-pie-chart__legend {
+    width: 100%;
+    gap: 0.65rem;
+}
+
+.fi-registry-pie-chart__legend-item,
+.fi-registry-pie-chart__legend-label {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.fi-registry-pie-chart__legend-item {
+    justify-content: space-between;
+    min-width: 0;
+    border: 1px solid var(--registry-border);
+    border-radius: 0.75rem;
+    background: var(--registry-surface-muted);
+    padding: 0.75rem 0.875rem;
+}
+
+.fi-registry-pie-chart__legend-label {
+    min-width: 0;
+}
+
+.fi-registry-pie-chart__legend-label span {
+    min-width: 0;
+    color: var(--registry-text);
+    font-size: 0.875rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.fi-registry-pie-chart__legend-item strong {
+    flex-shrink: 0;
+    color: var(--registry-text);
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.fi-registry-pie-chart__legend-item strong span {
+    color: var(--registry-muted);
+    font-weight: 550;
+}
+
+.fi-registry-follow-up {
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid var(--registry-border);
+    padding: 1rem 1.25rem;
+}
+
+.fi-registry-follow-up:first-child {
+    border-top: 0;
+}
+
+.fi-registry-follow-up {
+    align-items: center;
+    justify-content: space-between;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.fi-registry-follow-up:hover {
+    background: var(--registry-surface-muted);
+}
+
+.fi-registry-follow-up__patient {
+    display: grid;
+    min-width: 0;
+    gap: 0.2rem;
+}
+
+.fi-registry-follow-up__name {
+    color: var(--registry-text);
+    font-size: 0.875rem;
+    font-weight: 650;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.fi-registry-follow-up__meta {
+    color: var(--registry-muted);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+}
+
+.fi-registry-follow-up__badges {
+    display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.fi-registry-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+.fi-registry-empty__icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--registry-muted);
+}
+
+.fi-registry-empty__title {
+    font-size: 1rem;
+}
+
+.fi-registry-empty-line {
+    margin: 0;
+    border: 1px dashed var(--registry-border-strong);
+    border-radius: 0.625rem;
+    padding: 1rem;
+    color: var(--registry-muted);
+    font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+    .fi-registry-bar-chart__legend {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1280px) {
+    .fi-registry-dashboard__layout {
+        grid-template-columns: minmax(0, 1.7fr) minmax(20rem, 0.8fr);
+        align-items: start;
+    }
+
+    .fi-registry-panel--recent {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 640px) {
+    .fi-registry-panel__header,
+    .fi-registry-follow-up {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .fi-registry-panel__action,
+    .fi-registry-follow-up__badges {
+        justify-content: flex-start;
+    }
+}
+
 .fi-treatment-plan-busy-overlay {
     display: none;
     position: fixed;

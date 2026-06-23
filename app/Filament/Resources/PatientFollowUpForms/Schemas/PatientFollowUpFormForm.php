@@ -17,14 +17,31 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 
 class PatientFollowUpFormForm
 {
+    private static function overlay(): array
+    {
+        return [
+            'data.procedures_administered',
+            'data.treatment_plan',
+            'data.change_in_treatment_plan_procedures',
+            'data.availed_financial_support',
+            'data.financial_support_mechanisms',
+        ];
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
+                View::make('filament.forms.components.loading-overlay')
+                    ->viewData([
+                        'target' => self::overlay(),
+                    ])->liberatedFromContainerGrid(),
+
                 Section::make('Patient Follow-Up Information')
                     ->columnSpanFull()
                     ->schema([
@@ -135,117 +152,159 @@ class PatientFollowUpFormForm
                             ->live()
                             ->bulkToggleable(),
 
-                        Actions::make([
-                            Action::make('treatmentSurgery')
-                                ->label('Add Surgery')
-                                ->icon('heroicon-o-plus')
-                                ->visible(fn (Get $get): bool => in_array('Surgery', $get('procedures_administered') ?? []))
-                                ->modalHeading('Surgery Details')
-                                ->modalSubmitActionLabel('Save')
-                                ->form([
-                                    Section::make('Surgery Data')
-                                        ->description('Add one or more surgery records.')
-                                        ->schema(self::surgery()),
-                                ])
-                                ->fillForm(fn (Get $get): array => [
-                                    'surgeries' => $get('surgeries') ?? [],
-                                ])
-                                ->action(function (array $data, Set $set): void {
-                                    $set('surgeries', $data['surgeries'] ?? []);
-                                }),
+                        // Actions::make([
+                        //     Action::make('treatmentSurgery')
+                        //         ->label('Add Surgery')
+                        //         ->icon('heroicon-o-plus')
+                        //         ->visible(fn (Get $get): bool => in_array('Surgery', $get('procedures_administered') ?? []))
+                        //         ->modalHeading('Surgery Details')
+                        //         ->modalSubmitActionLabel('Save')
+                        //         ->form([
+                        //             Section::make('Surgery Data')
+                        //                 ->description('Add one or more surgery records.')
+                        //                 ->schema(self::surgery()),
+                        //         ])
+                        //         ->fillForm(fn (Get $get): array => [
+                        //             'surgeries' => $get('surgeries') ?? [],
+                        //         ])
+                        //         ->action(function (array $data, Set $set): void {
+                        //             $set('surgeries', $data['surgeries'] ?? []);
+                        //         }),
 
-                            Action::make('treatmentAntiCancerDrugTherapy')
-                                ->label('Add Anti-Cancer Drug Therapy')
-                                ->icon('heroicon-o-plus')
-                                ->visible(fn (Get $get): bool => in_array('Anti-cancer drug therapy', $get('procedures_administered') ?? []))
-                                ->modalHeading('FORM 2C: Anti-Cancer Drug Therapy')
-                                ->modalSubmitActionLabel('Save')
-                                ->form([
-                                    Section::make('Anti-Cancer Drug Therapy Data')
-                                        ->description('Add one or more anti-cancer drug therapy records.')
-                                        ->schema(self::antiCancer()),
-                                ])
-                                ->fillForm(fn (Get $get): array => [
-                                    'anti_cancer_drug_therapies' => $get('anti_cancer_drug_therapies') ?? [],
-                                ])
-                                ->action(function (array $data, Set $set): void {
-                                    $set('anti_cancer_drug_therapies', $data['anti_cancer_drug_therapies'] ?? []);
-                                }),
+                        //     Action::make('treatmentAntiCancerDrugTherapy')
+                        //         ->label('Add Anti-Cancer Drug Therapy')
+                        //         ->icon('heroicon-o-plus')
+                        //         ->visible(fn (Get $get): bool => in_array('Anti-cancer drug therapy', $get('procedures_administered') ?? []))
+                        //         ->modalHeading('FORM 2C: Anti-Cancer Drug Therapy')
+                        //         ->modalSubmitActionLabel('Save')
+                        //         ->form([
+                        //             Section::make('Anti-Cancer Drug Therapy Data')
+                        //                 ->description('Add one or more anti-cancer drug therapy records.')
+                        //                 ->schema(self::antiCancer()),
+                        //         ])
+                        //         ->fillForm(fn (Get $get): array => [
+                        //             'anti_cancer_drug_therapies' => $get('anti_cancer_drug_therapies') ?? [],
+                        //         ])
+                        //         ->action(function (array $data, Set $set): void {
+                        //             $set('anti_cancer_drug_therapies', $data['anti_cancer_drug_therapies'] ?? []);
+                        //         }),
 
-                            Action::make('treatmentRadiotherapy')
-                                ->label('Add Radiotherapy')
-                                ->icon('heroicon-o-plus')
-                                ->visible(fn (Get $get): bool => in_array('Radiotherapy', $get('procedures_administered') ?? []))
-                                ->modalHeading('FORM 2D: Radiotherapy')
-                                ->modalSubmitActionLabel('Save Radiotherapy')
-                                ->form([
-                                    Section::make('Radiotherapy Data')
-                                        ->description('Add one or more radiotherapy records.')
-                                        ->schema(self::radiotherapyRepeaterSchema()),
-                                ])
-                                ->fillForm(fn (Get $get): array => [
-                                    'radiotherapies' => $get('radiotherapies') ?? [],
-                                ])
-                                ->action(function (array $data, Set $set): void {
-                                    $set('radiotherapies', $data['radiotherapies'] ?? []);
-                                }),
+                        //     Action::make('treatmentRadiotherapy')
+                        //         ->label('Add Radiotherapy')
+                        //         ->icon('heroicon-o-plus')
+                        //         ->visible(fn (Get $get): bool => in_array('Radiotherapy', $get('procedures_administered') ?? []))
+                        //         ->modalHeading('FORM 2D: Radiotherapy')
+                        //         ->modalSubmitActionLabel('Save Radiotherapy')
+                        //         ->form([
+                        //             Section::make('Radiotherapy Data')
+                        //                 ->description('Add one or more radiotherapy records.')
+                        //                 ->schema(self::radiotherapyRepeaterSchema()),
+                        //         ])
+                        //         ->fillForm(fn (Get $get): array => [
+                        //             'radiotherapies' => $get('radiotherapies') ?? [],
+                        //         ])
+                        //         ->action(function (array $data, Set $set): void {
+                        //             $set('radiotherapies', $data['radiotherapies'] ?? []);
+                        //         }),
 
-                            Action::make('treatmentTheranostics')
-                                ->label('Add Theranostics')
-                                ->icon('heroicon-o-plus')
-                                ->visible(fn (Get $get): bool => in_array('Theranostics', $get('procedures_administered') ?? []))
-                                ->modalHeading('Theranostics Details')
-                                ->modalSubmitActionLabel('Save')
-                                ->form([
-                                    Section::make('THERANOSTICS')
-                                        ->schema(self::theranosticsRepeaterSchema()),
-                                ])
-                                ->fillForm(fn (Get $get): array => [
-                                    'theranostics' => $get('theranostics') ?? [],
-                                ])
-                                ->action(function (array $data, Set $set): void {
-                                    $set('theranostics', $data['theranostics'] ?? []);
-                                }),
+                        //     Action::make('treatmentTheranostics')
+                        //         ->label('Add Theranostics')
+                        //         ->icon('heroicon-o-plus')
+                        //         ->visible(fn (Get $get): bool => in_array('Theranostics', $get('procedures_administered') ?? []))
+                        //         ->modalHeading('Theranostics Details')
+                        //         ->modalSubmitActionLabel('Save')
+                        //         ->form([
+                        //             Section::make('THERANOSTICS')
+                        //                 ->schema(self::theranosticsRepeaterSchema()),
+                        //         ])
+                        //         ->fillForm(fn (Get $get): array => [
+                        //             'theranostics' => $get('theranostics') ?? [],
+                        //         ])
+                        //         ->action(function (array $data, Set $set): void {
+                        //             $set('theranostics', $data['theranostics'] ?? []);
+                        //         }),
 
-                            Action::make('treatmentPalliativeCare')
-                                ->label('Add Palliative Care')
-                                ->icon('heroicon-o-plus')
-                                ->visible(fn (Get $get): bool => in_array('Palliative Care', $get('procedures_administered') ?? []))
-                                ->modalHeading('Palliative Care Details')
-                                ->modalSubmitActionLabel('Save')
-                                ->form([
-                                    Section::make('Palliative Care')
-                                        ->description('Palliative Care Details')
-                                        ->schema(self::palliativeCareSchema())
-                                        ->columnSpanFull(),
-                                ])
-                                ->fillForm(fn (Get $get): array => [
-                                    'palliative_cares' => $get('palliative_cares') ?? [],
-                                ])
-                                ->action(function (array $data, Set $set): void {
-                                    $set('palliative_cares', $data['palliative_cares'] ?? []);
-                                }),
+                        //     Action::make('treatmentPalliativeCare')
+                        //         ->label('Add Palliative Care')
+                        //         ->icon('heroicon-o-plus')
+                        //         ->visible(fn (Get $get): bool => in_array('Palliative Care', $get('procedures_administered') ?? []))
+                        //         ->modalHeading('Palliative Care Details')
+                        //         ->modalSubmitActionLabel('Save')
+                        //         ->form([
+                        //             Section::make('Palliative Care')
+                        //                 ->description('Palliative Care Details')
+                        //                 ->schema(self::palliativeCareSchema())
+                        //                 ->columnSpanFull(),
+                        //         ])
+                        //         ->fillForm(fn (Get $get): array => [
+                        //             'palliative_cares' => $get('palliative_cares') ?? [],
+                        //         ])
+                        //         ->action(function (array $data, Set $set): void {
+                        //             $set('palliative_cares', $data['palliative_cares'] ?? []);
+                        //         }),
 
-                            Action::make('treatmentOtherTreatments')
-                                ->label('Add Other Treatments')
-                                ->icon('heroicon-o-plus')
-                                ->visible(fn (Get $get): bool => in_array('Other Treatments', $get('procedures_administered') ?? []))
-                                ->modalHeading('Other Treatments Details')
-                                ->modalSubmitActionLabel('Save')
-                                ->form([
-                                    Section::make('Other Treatments')
-                                        ->description('Other Treatments Details')
-                                        ->schema(self::otherTreatmentsSchema())
-                                        ->columnSpanFull(),
-                                ])
-                                ->fillForm(fn (Get $get): array => [
-                                    'other_cancer_directed_therapies' => $get('other_cancer_directed_therapies') ?? [],
-                                ])
-                                ->action(function (array $data, Set $set): void {
-                                    $set('other_cancer_directed_therapies', $data['other_cancer_directed_therapies'] ?? []);
-                                }),
-                        ])->columnSpanFull(),
+                        //     Action::make('treatmentOtherTreatments')
+                        //         ->label('Add Other Treatments')
+                        //         ->icon('heroicon-o-plus')
+                        //         ->visible(fn (Get $get): bool => in_array('Other Treatments', $get('procedures_administered') ?? []))
+                        //         ->modalHeading('Other Treatments Details')
+                        //         ->modalSubmitActionLabel('Save')
+                        //         ->form([
+                        //             Section::make('Other Treatments')
+                        //                 ->description('Other Treatments Details')
+                        //                 ->schema(self::otherTreatmentsSchema())
+                        //                 ->columnSpanFull(),
+                        //         ])
+                        //         ->fillForm(fn (Get $get): array => [
+                        //             'other_cancer_directed_therapies' => $get('other_cancer_directed_therapies') ?? [],
+                        //         ])
+                        //         ->action(function (array $data, Set $set): void {
+                        //             $set('other_cancer_directed_therapies', $data['other_cancer_directed_therapies'] ?? []);
+                        //         }),
+                        // ])->columnSpanFull(),
                     ]),
+
+                Section::make('Surgery')
+                    ->label('Surgery')
+                    ->description('Encode the relevant data to Form 2B Surgery')
+                    ->schema(self::surgerySchema())
+                    ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => in_array('Surgery', $get('procedures_administered') ?? [])),
+
+                Section::make('Anti-cancer drug therapy')
+                    ->label('Anti-cancer drug therapy')
+                    ->description('Encode the relevant data to Form 2B Anti-cancer drug therapy')
+                    ->schema(self::antiCancerDrugTherapySchema())
+                    ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => in_array('Anti-cancer drug therapy', $get('procedures_administered') ?? [])),
+
+                Section::make('Radiation therapy')
+                    ->label('Radiation therapy')
+                    ->description('Encode the relevant data to Form 2B Radiation therapy')
+                    ->schema(self::radiotherapyRepeaterSchema())
+                    ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => in_array('Radiotherapy', $get('procedures_administered') ?? [])),
+
+                Section::make('Theranostics')
+                    ->label('Theranostics')
+                    ->description('Encode the relevant data to Form 2B Theranostics')
+                    ->schema(self::theranosticsRepeaterSchema())
+                    ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => in_array('Theranostics', $get('procedures_administered') ?? [])),
+
+                Section::make('Palliative Care')
+                    ->label('Palliative Care')
+                    ->description('Encode the relevant data to Form 2B Palliative Care')
+                    ->schema(self::palliativeCareSchema())
+                    ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => in_array('Palliative Care', $get('procedures_administered') ?? [])),
+
+                Section::make('Other Treatments')
+                    ->label('Other Treatments')
+                    ->description('Encode the relevant data to Form 2B Other Treatments')
+                    ->schema(self::otherTreatmentsSchema())
+                    ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => in_array('Other Treatments', $get('procedures_administered') ?? [])),
 
                 Section::make('Medical Evaluation / Treatment Outcomes')
                     ->columnSpanFull()
@@ -416,7 +475,7 @@ class PatientFollowUpFormForm
                             ->inline()
                             ->default(0)
                             ->live()
-                            ->dehydrateStateUsing(fn ($state): bool => (bool) $state),
+                            ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
 
                         CheckboxList::make('financial_support_mechanisms')
                             ->label('Financial Support Mechanisms')
@@ -464,7 +523,7 @@ class PatientFollowUpFormForm
     /**
      * @return array<int, mixed>
      */
-    private static function surgery(): array
+    private static function surgerySchema(): array
     {
         return [
             Repeater::make('surgeries')
@@ -524,7 +583,7 @@ class PatientFollowUpFormForm
         ];
     }
 
-    private static function antiCancer(): array
+    private static function antiCancerDrugTherapySchema(): array
     {
         return [
 
@@ -1167,6 +1226,41 @@ class PatientFollowUpFormForm
                             'default' => 1,
                             'md' => 1,
                         ]),
+                ]),
+        ];
+    }
+
+    private static function surgeryTable(): array
+    {
+        return [
+            Table::make('surgeries')
+                ->label('Surgeries')
+                ->columns([
+                    Tables\Columns\TextColumn::make('surgery_date')
+                        ->label('Surgery Date')
+                        ->date('Y-m-d'),
+
+                    Tables\Columns\TextColumn::make('surgery_rvs_code')
+                        ->label('Surgery Type / RVS Code'),
+
+                    Tables\Columns\TextColumn::make('surgery_description')
+                        ->label('Surgery Description'),
+
+                    Tables\Columns\TextColumn::make('surgery_goal')
+                        ->label('Goal of Surgery'),
+                ])
+                ->filters([
+                    //
+                ])
+                ->headerActions([
+                    Tables\Actions\CreateAction::make(),
+                ])
+                ->rowActions([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
+                ->bulkActions([
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
         ];
     }
