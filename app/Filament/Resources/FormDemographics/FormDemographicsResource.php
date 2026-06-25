@@ -18,7 +18,7 @@ class FormDemographicsResource extends Resource
 {
     protected static ?string $model = FormDemographics::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Folder;
 
     protected static ?string $navigationLabel = 'Patient Records';
 

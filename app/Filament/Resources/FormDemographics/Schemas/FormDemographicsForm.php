@@ -2,26 +2,27 @@
 
 namespace App\Filament\Resources\FormDemographics\Schemas;
 
+use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\View;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
-use Carbon\Carbon;
 
 class FormDemographicsForm
 {
     public $conn;
+
     public function __construct()
     {
         return $this->conn = DB::connection('sqlsrv');
@@ -33,14 +34,14 @@ class FormDemographicsForm
             ->columns(1)
             ->components([
                 View::make('filament.forms.components.loading-overlay')
-                ->viewData([
-                    'target' => [
-                        'data.philhealth_pin_na',
-                        'data.same_as_permanent_address',
-                        'data.mobile_contact_na',
-                        'data.email_na',
-                    ],
-                ])->liberatedFromContainerGrid(),
+                    ->viewData([
+                        'target' => [
+                            'data.philhealth_pin_na',
+                            'data.same_as_permanent_address',
+                            'data.mobile_contact_na',
+                            'data.email_na',
+                        ],
+                    ])->liberatedFromContainerGrid(),
                 Section::make('Encounter and Patient')
                     ->columnSpanFull()
                     ->columns([
@@ -333,23 +334,19 @@ class FormDemographicsForm
                         'xl' => 12,
                     ])
                     ->schema([
-                        Checkbox::make('philhealth_pin_na')
-                            ->label('PhilHealth PIN N/A')
-                            ->live()
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ]),
 
-                        TextInput::make('philhealth_pin')
-                            ->label('PhilHealth Identification No. (PIN)')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 9,
-                            ])
-                            ->maxLength(12)
-                            ->placeholder('Enter PhilHealth Identification No.')
-                            ->disabled(fn (Get $get): bool => (bool) $get('philhealth_pin_na')),
+                        Group::make([
+                            Checkbox::make('philhealth_pin_na')
+                                ->label('PhilHealth PIN N/A'),
+
+                            TextInput::make('philhealth_pin')
+                                ->label('PhilHealth PIN')
+                                ->placeholder('Enter PhilHealth PIN')
+                                ->maxLength(20)
+                                ->hiddenJs(<<<'JS'
+                                    $get('philhealth_pin_na')
+                                JS),
+                        ])->columnSpanFull(),
 
                         TextInput::make('permanent_region')
                             ->label('Permanent Address - Region')
@@ -453,28 +450,30 @@ class FormDemographicsForm
                     ->schema([
                         Group::make([
                             Checkbox::make('mobile_contact_na')
-                                ->label('Mobile Contact No. N/A')
-                                ->live(),
+                                ->label('Mobile Contact No. N/A'),
 
                             TextInput::make('mobile_contact_no')
                                 ->label('Mobile Contact No.')
                                 ->tel()
                                 ->placeholder('Enter mobile contact number')
                                 ->maxLength(20)
-                                ->hidden(fn (Get $get): bool => (bool) $get('mobile_contact_na')),
+                                ->hiddenJs(<<<'JS'
+                                    $get('mobile_contact_na')
+                                JS),
                         ])->columns(1),
 
                         Group::make([
                             Checkbox::make('email_na')
-                                ->label('Email Address N/A')
-                                ->live(),
+                                ->label('Email Address N/A'),
 
                             TextInput::make('email_address')
                                 ->label('Email Address')
                                 ->email()
                                 ->placeholder('Enter email address')
                                 ->maxLength(255)
-                                ->hidden(fn (Get $get): bool => (bool) $get('email_na')),
+                                ->hiddenJs(<<<'JS'
+                                    $get('email_na')
+                                JS),
                         ])->columns(1),
                     ]),
 
@@ -494,14 +493,15 @@ class FormDemographicsForm
                             ])
                             ->inline()
                             ->inlineLabel(false)
-                            ->live()
                             ->required()
                             ->columnSpanFull(),
 
                         TextInput::make('relationship_other_specify')
                             ->label('Other, Specify')
                             ->maxLength(100)
-                            ->visible(fn (Get $get): bool => $get('relationship_to_patient') === 'other')
+                            ->visibleJs(<<<'JS'
+                                $get('relationship_to_patient') === 'other'
+                            JS)
                             ->columnSpanFull(),
                     ]),
             ]);

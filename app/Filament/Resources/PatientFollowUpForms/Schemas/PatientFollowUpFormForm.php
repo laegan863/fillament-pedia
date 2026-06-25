@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\PatientFollowUpForms\Schemas;
 
 use App\Models\FormDemographics;
-use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
@@ -12,11 +11,9 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 
@@ -82,26 +79,34 @@ class PatientFollowUpFormForm
                             ])
                             ->inline()
                             ->default(0)
-                            ->live()
                             ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
+
+                        Section::make('Ammendment Form')
+                            ->description('(Filled for cases of additional diagnosis, change in diagnosis, and other adjustments caused by additional information/testing)')
+                            ->visibleJs(<<<'JS'
+                                Number($get('has_change_in_diagnosis')) === 1
+                            JS)
+                            ->schema([
+                                // add the ammendment form here
+                            ]),
 
                         Radio::make('has_more_than_one_primary_site')
                             ->label('Was there more than one primary site being treated in the past quarter?')
                             ->options([
-                                1 => 'Yes',
-                                0 => 'No',
+                                '1' => 'Yes',
+                                '0' => 'No',
                             ])
                             ->inline()
-                            ->default(0)
-                            ->live()
-                            ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
+                            ->default('0'),
 
                         Select::make('primary_sites_being_treated')
                             ->label('Primary Sites Being Treated')
                             ->helperText('Select multiple if there is more than one primary site being treated.')
                             ->multiple()
                             ->searchable()
-                            ->native(false)
+                            ->hiddenJs(<<<'JS'
+                                $get('has_more_than_one_primary_site') !== '1'
+                            JS)
                             ->options([
                                 'Lymphoid Leukemia, NOS' => 'Lymphoid Leukemia, NOS',
                                 'Acute Lymphoblastic Leukemia' => 'Acute Lymphoblastic Leukemia',
@@ -149,119 +154,7 @@ class PatientFollowUpFormForm
                                 'default' => 1,
                                 'md' => 2,
                             ])
-                            ->live()
                             ->bulkToggleable(),
-
-                        // Actions::make([
-                        //     Action::make('treatmentSurgery')
-                        //         ->label('Add Surgery')
-                        //         ->icon('heroicon-o-plus')
-                        //         ->visible(fn (Get $get): bool => in_array('Surgery', $get('procedures_administered') ?? []))
-                        //         ->modalHeading('Surgery Details')
-                        //         ->modalSubmitActionLabel('Save')
-                        //         ->form([
-                        //             Section::make('Surgery Data')
-                        //                 ->description('Add one or more surgery records.')
-                        //                 ->schema(self::surgery()),
-                        //         ])
-                        //         ->fillForm(fn (Get $get): array => [
-                        //             'surgeries' => $get('surgeries') ?? [],
-                        //         ])
-                        //         ->action(function (array $data, Set $set): void {
-                        //             $set('surgeries', $data['surgeries'] ?? []);
-                        //         }),
-
-                        //     Action::make('treatmentAntiCancerDrugTherapy')
-                        //         ->label('Add Anti-Cancer Drug Therapy')
-                        //         ->icon('heroicon-o-plus')
-                        //         ->visible(fn (Get $get): bool => in_array('Anti-cancer drug therapy', $get('procedures_administered') ?? []))
-                        //         ->modalHeading('FORM 2C: Anti-Cancer Drug Therapy')
-                        //         ->modalSubmitActionLabel('Save')
-                        //         ->form([
-                        //             Section::make('Anti-Cancer Drug Therapy Data')
-                        //                 ->description('Add one or more anti-cancer drug therapy records.')
-                        //                 ->schema(self::antiCancer()),
-                        //         ])
-                        //         ->fillForm(fn (Get $get): array => [
-                        //             'anti_cancer_drug_therapies' => $get('anti_cancer_drug_therapies') ?? [],
-                        //         ])
-                        //         ->action(function (array $data, Set $set): void {
-                        //             $set('anti_cancer_drug_therapies', $data['anti_cancer_drug_therapies'] ?? []);
-                        //         }),
-
-                        //     Action::make('treatmentRadiotherapy')
-                        //         ->label('Add Radiotherapy')
-                        //         ->icon('heroicon-o-plus')
-                        //         ->visible(fn (Get $get): bool => in_array('Radiotherapy', $get('procedures_administered') ?? []))
-                        //         ->modalHeading('FORM 2D: Radiotherapy')
-                        //         ->modalSubmitActionLabel('Save Radiotherapy')
-                        //         ->form([
-                        //             Section::make('Radiotherapy Data')
-                        //                 ->description('Add one or more radiotherapy records.')
-                        //                 ->schema(self::radiotherapyRepeaterSchema()),
-                        //         ])
-                        //         ->fillForm(fn (Get $get): array => [
-                        //             'radiotherapies' => $get('radiotherapies') ?? [],
-                        //         ])
-                        //         ->action(function (array $data, Set $set): void {
-                        //             $set('radiotherapies', $data['radiotherapies'] ?? []);
-                        //         }),
-
-                        //     Action::make('treatmentTheranostics')
-                        //         ->label('Add Theranostics')
-                        //         ->icon('heroicon-o-plus')
-                        //         ->visible(fn (Get $get): bool => in_array('Theranostics', $get('procedures_administered') ?? []))
-                        //         ->modalHeading('Theranostics Details')
-                        //         ->modalSubmitActionLabel('Save')
-                        //         ->form([
-                        //             Section::make('THERANOSTICS')
-                        //                 ->schema(self::theranosticsRepeaterSchema()),
-                        //         ])
-                        //         ->fillForm(fn (Get $get): array => [
-                        //             'theranostics' => $get('theranostics') ?? [],
-                        //         ])
-                        //         ->action(function (array $data, Set $set): void {
-                        //             $set('theranostics', $data['theranostics'] ?? []);
-                        //         }),
-
-                        //     Action::make('treatmentPalliativeCare')
-                        //         ->label('Add Palliative Care')
-                        //         ->icon('heroicon-o-plus')
-                        //         ->visible(fn (Get $get): bool => in_array('Palliative Care', $get('procedures_administered') ?? []))
-                        //         ->modalHeading('Palliative Care Details')
-                        //         ->modalSubmitActionLabel('Save')
-                        //         ->form([
-                        //             Section::make('Palliative Care')
-                        //                 ->description('Palliative Care Details')
-                        //                 ->schema(self::palliativeCareSchema())
-                        //                 ->columnSpanFull(),
-                        //         ])
-                        //         ->fillForm(fn (Get $get): array => [
-                        //             'palliative_cares' => $get('palliative_cares') ?? [],
-                        //         ])
-                        //         ->action(function (array $data, Set $set): void {
-                        //             $set('palliative_cares', $data['palliative_cares'] ?? []);
-                        //         }),
-
-                        //     Action::make('treatmentOtherTreatments')
-                        //         ->label('Add Other Treatments')
-                        //         ->icon('heroicon-o-plus')
-                        //         ->visible(fn (Get $get): bool => in_array('Other Treatments', $get('procedures_administered') ?? []))
-                        //         ->modalHeading('Other Treatments Details')
-                        //         ->modalSubmitActionLabel('Save')
-                        //         ->form([
-                        //             Section::make('Other Treatments')
-                        //                 ->description('Other Treatments Details')
-                        //                 ->schema(self::otherTreatmentsSchema())
-                        //                 ->columnSpanFull(),
-                        //         ])
-                        //         ->fillForm(fn (Get $get): array => [
-                        //             'other_cancer_directed_therapies' => $get('other_cancer_directed_therapies') ?? [],
-                        //         ])
-                        //         ->action(function (array $data, Set $set): void {
-                        //             $set('other_cancer_directed_therapies', $data['other_cancer_directed_therapies'] ?? []);
-                        //         }),
-                        // ])->columnSpanFull(),
                     ]),
 
                 Section::make('Surgery')
@@ -269,42 +162,54 @@ class PatientFollowUpFormForm
                     ->description('Encode the relevant data to Form 2B Surgery')
                     ->schema(self::surgerySchema())
                     ->columnSpanFull()
-                    ->visible(fn (Get $get): bool => in_array('Surgery', $get('procedures_administered') ?? [])),
+                    ->visibleJs(<<<'JS'
+                        ($get('procedures_administered') ?? []).includes('Surgery')
+                    JS),
 
                 Section::make('Anti-cancer drug therapy')
                     ->label('Anti-cancer drug therapy')
                     ->description('Encode the relevant data to Form 2B Anti-cancer drug therapy')
                     ->schema(self::antiCancerDrugTherapySchema())
                     ->columnSpanFull()
-                    ->visible(fn (Get $get): bool => in_array('Anti-cancer drug therapy', $get('procedures_administered') ?? [])),
+                    ->visibleJs(<<<'JS'
+                        ($get('procedures_administered') ?? []).includes('Anti-cancer drug therapy')
+                    JS),
 
                 Section::make('Radiation therapy')
                     ->label('Radiation therapy')
                     ->description('Encode the relevant data to Form 2B Radiation therapy')
                     ->schema(self::radiotherapyRepeaterSchema())
                     ->columnSpanFull()
-                    ->visible(fn (Get $get): bool => in_array('Radiotherapy', $get('procedures_administered') ?? [])),
+                    ->visibleJs(<<<'JS'
+                        ($get('procedures_administered') ?? []).includes('Radiotherapy')
+                    JS),
 
                 Section::make('Theranostics')
                     ->label('Theranostics')
                     ->description('Encode the relevant data to Form 2B Theranostics')
                     ->schema(self::theranosticsRepeaterSchema())
                     ->columnSpanFull()
-                    ->visible(fn (Get $get): bool => in_array('Theranostics', $get('procedures_administered') ?? [])),
+                    ->visibleJs(<<<'JS'
+                        ($get('procedures_administered') ?? []).includes('Theranostics')
+                    JS),
 
                 Section::make('Palliative Care')
                     ->label('Palliative Care')
                     ->description('Encode the relevant data to Form 2B Palliative Care')
                     ->schema(self::palliativeCareSchema())
                     ->columnSpanFull()
-                    ->visible(fn (Get $get): bool => in_array('Palliative Care', $get('procedures_administered') ?? [])),
+                    ->visibleJs(<<<'JS'
+                        ($get('procedures_administered') ?? []).includes('Palliative Care')
+                    JS),
 
                 Section::make('Other Treatments')
                     ->label('Other Treatments')
                     ->description('Encode the relevant data to Form 2B Other Treatments')
                     ->schema(self::otherTreatmentsSchema())
                     ->columnSpanFull()
-                    ->visible(fn (Get $get): bool => in_array('Other Treatments', $get('procedures_administered') ?? [])),
+                    ->visibleJs(<<<'JS'
+                        ($get('procedures_administered') ?? []).includes('Other Treatments')
+                    JS),
 
                 Section::make('Medical Evaluation / Treatment Outcomes')
                     ->columnSpanFull()
@@ -344,14 +249,20 @@ class PatientFollowUpFormForm
                                 'default' => 1,
                                 'md' => 2,
                             ])
-                            ->live()
                             ->columnSpanFull(),
 
                         DatePicker::make('disease_outcome_date')
                             ->label('Date of Disease Outcome')
                             ->native(false)
                             ->displayFormat('Y-m-d'),
+                    ])
+                    ->columns([
+                        'default' => 1,
+                        'md' => 2,
+                    ]),
 
+                Section::make('Case of Death')
+                    ->schema([
                         Grid::make([
                             'default' => 1,
                             'md' => 2,
@@ -378,7 +289,7 @@ class PatientFollowUpFormForm
                     ->columns([
                         'default' => 1,
                         'md' => 2,
-                    ]),
+                    ])->columnSpanFull(),
 
                 Section::make('Treatment Plan')
                     ->columnSpanFull()
@@ -400,14 +311,15 @@ class PatientFollowUpFormForm
                                 'default' => 1,
                                 'md' => 2,
                             ])
-                            ->live()
                             ->bulkToggleable()
                             ->columnSpanFull(),
 
                         Textarea::make('treatment_plan_others')
                             ->label('Others, specify')
                             ->rows(2)
-                            ->visible(fn (Get $get): bool => in_array('Others, specify', $get('treatment_plan') ?? [], true))
+                            ->hiddenJs(<<<'JS'
+                                !($get('treatment_plan') ?? []).includes('Others, specify')
+                            JS)
                             ->columnSpanFull(),
 
                         CheckboxList::make('change_in_treatment_plan_procedures')
@@ -422,40 +334,47 @@ class PatientFollowUpFormForm
                             ->columns([
                                 'default' => 1,
                                 'md' => 2,
-                            ])
-                            ->live()
-                            ->columnSpanFull(),
+                            ])->columnSpanFull(),
 
                         Grid::make([
                             'default' => 1,
                             'md' => 2,
+                        ])->schema([
+                            Textarea::make('change_in_treatment_plan_reasons.surgery')
+                                ->label('Reason for Change - Surgery')
+                                ->rows(2)
+                                ->hiddenJs(<<<'JS'
+                                    !($get('change_in_treatment_plan_procedures') ?? []).includes('Surgery')
+                                JS),
+
+                            Textarea::make('change_in_treatment_plan_reasons.anti_cancer_drug_therapy')
+                                ->label('Reason for Change - Anti-cancer drug therapy')
+                                ->rows(2)
+                                ->hiddenJs(<<<'JS'
+                                    !($get('change_in_treatment_plan_procedures') ?? []).includes('Anti-cancer drug therapy')
+                                JS),
+
+                            Textarea::make('change_in_treatment_plan_reasons.radiotherapy')
+                                ->label('Reason for Change - Radiotherapy')
+                                ->rows(2)
+                                ->hiddenJs(<<<'JS'
+                                    !($get('change_in_treatment_plan_procedures') ?? []).includes('Radiotherapy')
+                                JS),
+
+                            Textarea::make('change_in_treatment_plan_reasons.theranostics')
+                                ->label('Reason for Change - Theranostics')
+                                ->rows(2)
+                                ->hiddenJs(<<<'JS'
+                                    !($get('change_in_treatment_plan_procedures') ?? []).includes('Theranostics')
+                                JS),
+
+                            Textarea::make('change_in_treatment_plan_reasons.other_treatments')
+                                ->label('Reason for Change - Other Treatments')
+                                ->rows(2)
+                                ->hiddenJs(<<<'JS'
+                                    !($get('change_in_treatment_plan_procedures') ?? []).includes('Other Treatments')
+                                JS),
                         ])
-                            ->schema([
-                                Textarea::make('change_in_treatment_plan_reasons.surgery')
-                                    ->label('Reason for Change - Surgery')
-                                    ->rows(2)
-                                    ->visible(fn (Get $get): bool => in_array('Surgery', $get('change_in_treatment_plan_procedures') ?? [], true)),
-
-                                Textarea::make('change_in_treatment_plan_reasons.anti_cancer_drug_therapy')
-                                    ->label('Reason for Change - Anti-cancer drug therapy')
-                                    ->rows(2)
-                                    ->visible(fn (Get $get): bool => in_array('Anti-cancer drug therapy', $get('change_in_treatment_plan_procedures') ?? [], true)),
-
-                                Textarea::make('change_in_treatment_plan_reasons.radiotherapy')
-                                    ->label('Reason for Change - Radiotherapy')
-                                    ->rows(2)
-                                    ->visible(fn (Get $get): bool => in_array('Radiotherapy', $get('change_in_treatment_plan_procedures') ?? [], true)),
-
-                                Textarea::make('change_in_treatment_plan_reasons.theranostics')
-                                    ->label('Reason for Change - Theranostics')
-                                    ->rows(2)
-                                    ->visible(fn (Get $get): bool => in_array('Theranostics', $get('change_in_treatment_plan_procedures') ?? [], true)),
-
-                                Textarea::make('change_in_treatment_plan_reasons.other_treatments')
-                                    ->label('Reason for Change - Other Treatments')
-                                    ->rows(2)
-                                    ->visible(fn (Get $get): bool => in_array('Other Treatments', $get('change_in_treatment_plan_procedures') ?? [], true)),
-                            ])
                             ->columnSpanFull(),
                     ])
                     ->columns([
@@ -474,7 +393,6 @@ class PatientFollowUpFormForm
                             ])
                             ->inline()
                             ->default(0)
-                            ->live()
                             ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
 
                         CheckboxList::make('financial_support_mechanisms')
@@ -502,15 +420,18 @@ class PatientFollowUpFormForm
                                 'default' => 1,
                                 'md' => 2,
                             ])
-                            ->visible(fn (Get $get): bool => (bool) $get('availed_financial_support'))
-                            ->live()
+                            ->hiddenJs(<<<'JS'
+                                Number($get('availed_financial_support')) !== 1
+                            JS)
                             ->bulkToggleable()
                             ->columnSpanFull(),
 
                         Textarea::make('financial_support_others')
                             ->label('Others, specify')
                             ->rows(2)
-                            ->visible(fn (Get $get): bool => in_array('Others, specify', $get('financial_support_mechanisms') ?? [], true))
+                            ->hiddenJs(<<<'JS'
+                                !($get('financial_support_mechanisms') ?? []).includes('Others, specify')
+                            JS)
                             ->columnSpanFull(),
                     ])
                     ->columns([

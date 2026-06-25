@@ -1,0 +1,117 @@
+Source Row,General Classification,Parent Classification,Specific Classification
+3,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",Lymphoid Leukemia,Precursor cell leukemia
+4,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",Lymphoid Leukemia,Mature B cell leukemia
+5,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",Lymphoid Leukemia,Mature T and NK cell leukemia
+6,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",Lymphoid Leukemia,"Lymphoid Leukemia, NOS"
+7,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",-----,Acute Myeloid Leukemia
+8,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",-----,Chronic myeloproliferative disease
+9,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",-----,Myelodysplastic Syndrome and other myeloproliferative disease
+10,"Leukemias, Myeloproliferative Diseases, Myelodysplastic Disease",-----,Unspecified and other specified leukemias
+12,Lymphoma and reticuloendothelial neoplasms,-----,Hodgkin lymphoma
+14,Lymphoma and reticuloendothelial neoplasms,Non-Hodgkin Lymphoma,Precursor cell lymphoma
+15,Lymphoma and reticuloendothelial neoplasms,Non-Hodgkin Lymphoma,Mature B-cell lymphoma
+16,Lymphoma and reticuloendothelial neoplasms,Non-Hodgkin Lymphoma,Mature T-cell and NK-cell lymphoma
+17,Lymphoma and reticuloendothelial neoplasms,Non-Hodgkin Lymphoma,"Non-Hodgkin Lymphoma, Not otherwise specified"
+18,Lymphoma and reticuloendothelial neoplasms,-----,Burkitt lymphoma
+19,Lymphoma and reticuloendothelial neoplasms,-----,Miscellaneous lymphoreticular neoplasms
+20,Lymphoma and reticuloendothelial neoplasms,-----,Unscpecified lymphomas
+23,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Ependymoma and choroid plexus tumors,Ependymoma
+24,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Ependymoma and choroid plexus tumors,Choroid Plexus Tumors
+25,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,-----,Astrocytomas
+27,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Intracranial and Intraspinal Embryonal Tumors,Medulloblastoma
+28,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Intracranial and Intraspinal Embryonal Tumors,Primitive Neuroectodermal Tumor
+29,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Intracranial and Intraspinal Embryonal Tumors,Medulloepithelioma
+30,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Intracranial and Intraspinal Embryonal Tumors,Atypical Teratoid/Rhabdoid Tumor
+32,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Gliomas,Oligodendroglioma
+33,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Gliomas,Mixed and Unspecified Gliomas
+34,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Gliomas,Neuroepithelial Glial Tumors of Uncertain Origin
+36,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Specified Intracranial and Intraspinal Neoplasms,Pituitary Adenomas and Carcinomas
+37,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Specified Intracranial and Intraspinal Neoplasms,Tumors of the Sellar Region (Craniopharyngioma)
+38,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Specified Intracranial and Intraspinal Neoplasms,Pineal Parenchymal Tumors
+39,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Specified Intracranial and Intraspinal Neoplasms,Neuronal and Mixed Neuronal-Glial Tumors
+40,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,Other Specified Intracranial and Intraspinal Neoplasms,Meningiomas
+41,CNS and Miscellaneous Intracranial and Intraspinal Neoplasms,-----,Unspecified Intracranial and Intraspinal Neoplasms
+43,Neuroblastoma and Other Peripheral Nervous Cell Tumors,-----,Neuroblastoma and Ganglioneuroma
+44,Neuroblastoma and Other Peripheral Nervous Cell Tumors,-----,Other Peripheral Nervous Cell Tumors
+45,Retinoblastoma,-----,Retinoblastoma
+48,Renal Tumors,Nephroblastoma or Other Nonepithelial Renal Tumors,Nephroblastoma
+49,Renal Tumors,Nephroblastoma or Other Nonepithelial Renal Tumors,Rhabdoid Renal Tumor
+50,Renal Tumors,Nephroblastoma or Other Nonepithelial Renal Tumors,Kidney Sarcomas
+51,Renal Tumors,-----,Renal Carcinomas
+52,Renal Tumors,-----,Unspecified Malignant Renal Tumors
+55,Hepatic Tumors,Hepatoblastoma and Mesenchymal Tumor of Liver,Hepatoblastoma
+56,Hepatic Tumors,Hepatoblastoma and Mesenchymal Tumor of Liver,Rhabdoid Hepatic Tumor
+57,Hepatic Tumors,Hepatoblastoma and Mesenchymal Tumor of Liver,Embryonal Sarcoma of the Liver
+58,Hepatic Tumors,-----,Hepatic Carcinoma
+59,Hepatic Tumors,-----,Unspecified Malignant Hepatic Tumors
+61,Malignant Bone Tumors,-----,Osteosarcoma
+62,Malignant Bone Tumors,-----,Chondrosarcoma
+64,Malignant Bone Tumors,Ewing Tumors and Related Sarcomas of Bone,Ewing Sarcoma and Askin Tumor of Bone
+65,Malignant Bone Tumors,Ewing Tumors and Related Sarcomas of Bone,Peripheral Neuroectodermal Tumor of Bone
+67,Malignant Bone Tumors,Other Specified Malignant Bone Tumors,Malignant Fibrous Neoplasms of Bone
+68,Malignant Bone Tumors,Other Specified Malignant Bone Tumors,Malignant Chordomas
+69,Malignant Bone Tumors,Other Specified Malignant Bone Tumors,Odontogenic Malignant Tumors
+70,Malignant Bone Tumors,Other Specified Malignant Bone Tumors,Miscellaneous Malignant Bone Tumors
+71,Malignant Bone Tumors,-----,Other Unspecified Malignant Bone Tumors
+73,Soft Tissue and Other Extraosseous Sarcomas,-----,Rhabdomyosarcomas
+75,Soft Tissue and Other Extraosseous Sarcomas,Fibrosarcoma and Peripheral Nerve Sheath Tumors and Other Fibrous Neoplasms,Fibroblastic and Myoblastic Tumors
+76,Soft Tissue and Other Extraosseous Sarcomas,Fibrosarcoma and Peripheral Nerve Sheath Tumors and Other Fibrous Neoplasms,Nerve Sheath Tumor
+77,Soft Tissue and Other Extraosseous Sarcomas,Fibrosarcoma and Peripheral Nerve Sheath Tumors and Other Fibrous Neoplasms,Other Fibromatous Neoplasms
+78,Soft Tissue and Other Extraosseous Sarcomas,-----,Kaposi Sarcoma
+80,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Ewing Sarcoma and Askin Tumor of Soft Tissue
+81,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Peripheral Neuroectodermal Tumor of Soft Tissue
+82,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Extrarenal Extrahepatic Rhabdoid Tumor
+83,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Liposarcoma
+84,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Fibrohistiocytic Tumors
+85,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Leiomyosarcoma
+86,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Synovial Sarcoma
+87,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Blood Vessel Tumors
+88,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Osseous and Chondromatous Neoplasms of Soft Tissues
+89,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Alveolar Soft Part Sarcoma
+90,Soft Tissue and Other Extraosseous Sarcomas,Other Specified Soft Tissue Sarcomas,Miscellaneous Soft Tissue Sarcomas
+91,Soft Tissue and Other Extraosseous Sarcomas,-----,Unspecified Soft Tissue Sarcomas
+94,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Intracranial and Intraspinal Germ Cell Tumors,Intracranial and Intraspinal Germinomas
+95,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Intracranial and Intraspinal Germ Cell Tumors,Intracranial and Intraspinal Teratomas
+96,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Intracranial and Intraspinal Germ Cell Tumors,Intracranial and Intraspinal Embryonal Carcinomas
+97,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Intracranial and Intraspinal Germ Cell Tumors,Intracranial and Intraspinal Yolk Sac Tumor
+98,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Intracranial and Intraspinal Germ Cell Tumors,Intracranial and intraspinal choriocarcinoma
+99,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Intracranial and Intraspinal Germ Cell Tumors,Intracranial and intraspinal tumors of mixed forms
+101,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Extracranial and Extragonadal Sites,Malignant Germinomas of Extracranal and Extragonadal Sites
+102,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Extracranial and Extragonadal Sites,Malignant Teratomas of Extracranial and Extragonadal Sites
+103,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Extracranial and Extragonadal Sites,Embryonal Carcinoma of Extracranial and Extragonadala Sites
+104,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Extracranial and Extragonadal Sites,Yolk Sac Tumor of Extracranial and Extragonadal Sites
+105,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Extracranial and Extragonadal Sites,Choriocarcinomas of Extracranial and Extragonadal Sites
+106,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Extracranial and Extragonadal Sites,Other/Unspecified Malignant Germ Celll Tumor of Extracranial and Extragonadla Sites
+108,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Gonadal Germ Cell Tumors,Malignant Gonadal Germinomas
+109,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Gonadal Germ Cell Tumors,Malignant Gonadal Teratomas
+110,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Gonadal Germ Cell Tumors,Gonadal Embryonal Carcinomas
+111,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Gonadal Germ Cell Tumors,Gonadal Yolk Sac Tumor
+112,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Gonadal Germ Cell Tumors,Gonadal Choriocarccinoma
+113,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Gonadal Germ Cell Tumors,Malignant Gonadal Tumors of Mixed Forms
+114,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",Malignant Gonadal Germ Cell Tumors,Malignant gonal gonadoblastoma
+115,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",-----,Gonadal Carcinomas
+116,"Germ Cell Tumors, Trophoblastic Tumors and Neoplasms",-----,Other and Unspecified Malignant Gonadal Tumors
+118,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Adrenocortical Carcinomas
+119,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Thyroid Carcinoma
+120,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Nasopharyngeal Carcinoma
+121,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Malignant Melanoma
+122,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Skin Carcinoma
+123,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Other and Unspecified Carcinoma
+124,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of salivary glands
+125,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of colon and rectum
+126,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of appendix
+127,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of lung
+128,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of thymus
+129,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of breast
+130,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of cervix uteri
+131,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of bladder
+132,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of eye
+133,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of other specified sites
+134,Other Malignant Epithelial Neoplasms and Malignant Melanomas,-----,Carcinoma of unspecified sites
+137,Other and Unspecified Malignant Neoplasms,Other Specified Malignant Tumors,Malignant Gastrointestinal Stromal Tumor
+138,Other and Unspecified Malignant Neoplasms,Other Specified Malignant Tumors,Pancreatoblastoma
+139,Other and Unspecified Malignant Neoplasms,Other Specified Malignant Tumors,Pulmonary blastoma and pleuropulmonary blastoma
+140,Other and Unspecified Malignant Neoplasms,Other Specified Malignant Tumors,Other complex mixed and stromal neoplasms
+141,Other and Unspecified Malignant Neoplasms,Other Specified Malignant Tumors,Mesothelioma
+142,Other and Unspecified Malignant Neoplasms,Other Specified Malignant Tumors,Other specified malignant tumors
+143,Other and Unspecified Malignant Neoplasms,Other Specified Malignant Tumors,Other Unpecified malignant tumors

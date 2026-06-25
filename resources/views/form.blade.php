@@ -252,11 +252,22 @@
     @php
         $diagnosis = $cancerDiagnose ?? null;
         $diagnosisDate = $diagnosis?->diagnosis_date;
-        $metastasisSites = $diagnosis?->metastasis_sites ?? [];
-        $stagingUsed = $diagnosis?->staging_used ?? [];
-        $multidisciplinaryDisciplines = $diagnosis?->multidisciplinary_disciplines ?? [];
-        $antiCancerDrugTypes = $diagnosis?->anti_cancer_drug_types ?? [];
-        $otherCancerDirectedTherapyTypes = $diagnosis?->other_cancer_directed_therapy_types ?? [];
+        $values = function (mixed $value): array {
+            if (blank($value)) {
+                return [];
+            }
+
+            if (is_array($value)) {
+                return array_values(array_filter($value, fn (mixed $item): bool => filled($item)));
+            }
+
+            return [(string) $value];
+        };
+        $metastasisSites = $values($diagnosis?->metastasis_sites);
+        $stagingUsed = $values($diagnosis?->staging_used);
+        $multidisciplinaryDisciplines = $values($diagnosis?->multidisciplinary_disciplines);
+        $antiCancerDrugTypes = $values($diagnosis?->anti_cancer_drug_types);
+        $otherCancerDirectedTherapyTypes = $values($diagnosis?->other_cancer_directed_therapy_types);
         $patientHealthFacilityIdNo = filled($diagnosis?->patient_health_facility_id_no)
             ? (string) $diagnosis->patient_health_facility_id_no
             : (filled($formDetails->health_facility_id_no)
@@ -268,7 +279,7 @@
 
         $checked = fn (bool $condition): string => $condition ? ' checked' : '';
         $matches = fn (mixed $actual, string $expected): string => $checked($actual === $expected);
-        $contains = fn (array $actual, string $expected): string => $checked(in_array($expected, $actual, true));
+        $contains = fn (mixed $actual, string $expected): string => $checked(in_array($expected, $values($actual), true));
         $field = fn (mixed $value, string $fallback = ''): string => filled($value) ? (string) $value : $fallback;
         $characters = function (mixed $value, int $length): array {
             return array_pad(str_split((string) ($value ?? '')), $length, '');
