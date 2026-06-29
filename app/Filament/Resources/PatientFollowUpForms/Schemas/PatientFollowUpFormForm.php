@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PatientFollowUpForms\Schemas;
 
+use App\Filament\Resources\PatientFollowupAmmendments\Schemas\PatientFollowupAmmendmentsForm;
 use App\Models\FormDemographics;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
@@ -16,6 +17,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Arr;
 
 class PatientFollowUpFormForm
 {
@@ -28,6 +30,11 @@ class PatientFollowUpFormForm
             'data.availed_financial_support',
             'data.financial_support_mechanisms',
         ];
+    }
+
+    private static function hasProcedure(Get $get, string $procedure): bool
+    {
+        return in_array($procedure, Arr::wrap($get('procedures_administered')), true);
     }
 
     public static function configure(Schema $schema): Schema
@@ -81,15 +88,6 @@ class PatientFollowUpFormForm
                             ->default(0)
                             ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
 
-                        Section::make('Ammendment Form')
-                            ->description('(Filled for cases of additional diagnosis, change in diagnosis, and other adjustments caused by additional information/testing)')
-                            ->visibleJs(<<<'JS'
-                                Number($get('has_change_in_diagnosis')) === 1
-                            JS)
-                            ->schema([
-                                // add the ammendment form here
-                            ]),
-
                         Radio::make('has_more_than_one_primary_site')
                             ->label('Was there more than one primary site being treated in the past quarter?')
                             ->options([
@@ -98,6 +96,16 @@ class PatientFollowUpFormForm
                             ])
                             ->inline()
                             ->default('0'),
+
+                        Section::make('Ammendment Form')
+                            ->description('(Filled for cases of additional diagnosis, change in diagnosis, and other adjustments caused by additional information/testing)')
+                            ->relationship('patientFollowupAmmendment')
+                            ->visible(fn (Get $get): bool => (int) ($get('has_change_in_diagnosis') ?? 0) === 1)
+                            ->visibleJs(<<<'JS'
+                                Number($get('has_change_in_diagnosis')) === 1
+                            JS)
+                            ->columnSpanFull()
+                            ->schema(PatientFollowupAmmendmentsForm::schema()),
 
                         Select::make('primary_sites_being_treated')
                             ->label('Primary Sites Being Treated')
@@ -162,6 +170,7 @@ class PatientFollowUpFormForm
                     ->description('Encode the relevant data to Form 2B Surgery')
                     ->schema(self::surgerySchema())
                     ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => self::hasProcedure($get, 'Surgery'))
                     ->visibleJs(<<<'JS'
                         ($get('procedures_administered') ?? []).includes('Surgery')
                     JS),
@@ -171,6 +180,7 @@ class PatientFollowUpFormForm
                     ->description('Encode the relevant data to Form 2B Anti-cancer drug therapy')
                     ->schema(self::antiCancerDrugTherapySchema())
                     ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => self::hasProcedure($get, 'Anti-cancer drug therapy'))
                     ->visibleJs(<<<'JS'
                         ($get('procedures_administered') ?? []).includes('Anti-cancer drug therapy')
                     JS),
@@ -180,6 +190,7 @@ class PatientFollowUpFormForm
                     ->description('Encode the relevant data to Form 2B Radiation therapy')
                     ->schema(self::radiotherapyRepeaterSchema())
                     ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => self::hasProcedure($get, 'Radiotherapy'))
                     ->visibleJs(<<<'JS'
                         ($get('procedures_administered') ?? []).includes('Radiotherapy')
                     JS),
@@ -189,6 +200,7 @@ class PatientFollowUpFormForm
                     ->description('Encode the relevant data to Form 2B Theranostics')
                     ->schema(self::theranosticsRepeaterSchema())
                     ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => self::hasProcedure($get, 'Theranostics'))
                     ->visibleJs(<<<'JS'
                         ($get('procedures_administered') ?? []).includes('Theranostics')
                     JS),
@@ -198,6 +210,7 @@ class PatientFollowUpFormForm
                     ->description('Encode the relevant data to Form 2B Palliative Care')
                     ->schema(self::palliativeCareSchema())
                     ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => self::hasProcedure($get, 'Palliative Care'))
                     ->visibleJs(<<<'JS'
                         ($get('procedures_administered') ?? []).includes('Palliative Care')
                     JS),
@@ -207,6 +220,7 @@ class PatientFollowUpFormForm
                     ->description('Encode the relevant data to Form 2B Other Treatments')
                     ->schema(self::otherTreatmentsSchema())
                     ->columnSpanFull()
+                    ->visible(fn (Get $get): bool => self::hasProcedure($get, 'Other Treatments'))
                     ->visibleJs(<<<'JS'
                         ($get('procedures_administered') ?? []).includes('Other Treatments')
                     JS),

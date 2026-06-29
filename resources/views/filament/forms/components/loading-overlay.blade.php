@@ -35,7 +35,7 @@
         </svg>
 
         <span class="fi-loading-text">
-            Loading Please Wait...
+            Loading, please wait...
         </span> --}}
     </div>
 </div>

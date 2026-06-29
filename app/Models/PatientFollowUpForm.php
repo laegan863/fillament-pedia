@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 
@@ -111,6 +112,11 @@ class PatientFollowUpForm extends Model
     public function formDemographic(): BelongsTo
     {
         return $this->belongsTo(FormDemographics::class, 'form_demographic_id');
+    }
+
+    public function patientFollowupAmmendment(): HasOne
+    {
+        return $this->hasOne(PatientFollowupAmmendments::class);
     }
 
     public function surgeryRecords(): HasMany
