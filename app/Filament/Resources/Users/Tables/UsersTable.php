@@ -5,8 +5,11 @@ namespace App\Filament\Resources\Users\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
+use Filament\Notifications\Notification;
 
 class UsersTable
 {
@@ -33,6 +36,40 @@ class UsersTable
             ])
             ->recordActions([
                 EditAction::make(),
+                Action::make('sync')
+                ->label('Sync Account')
+                ->icon('heroicon-o-arrow-path')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading('Sync Account')
+                ->modalDescription('This will sync the user account with the HRMIS database.')
+                ->modalSubmitActionLabel('Sync')
+                ->action(function ($record) {
+                    $hrmisPassword = DB::connection('hrmis')
+                        ->table('users')
+                        ->where('email', $record->email)
+                        ->value('password');
+
+                    if (! $hrmisPassword) {
+                        Notification::make()
+                            ->title('Sync failed')
+                            ->body('No matching HRMIS account was found for this email.')
+                            ->danger()
+                            ->send();
+
+                        return;
+                    }
+
+                    $record->update([
+                        'password' => $hrmisPassword,
+                    ]);
+
+                    Notification::make()
+                        ->title('Account synced successfully')
+                        ->success()
+                        ->send();
+                })
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
