@@ -9,6 +9,7 @@ use App\Filament\Resources\FormDemographics\Schemas\FormDemographicsForm;
 use App\Filament\Resources\FormDemographics\Tables\FormDemographicsTable;
 use App\Models\FormDemographics;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,8 @@ class FormDemographicsResource extends Resource
     protected static ?string $model = FormDemographics::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Folder;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Main';
 
     protected static ?string $navigationLabel = 'Patient Records';
 
