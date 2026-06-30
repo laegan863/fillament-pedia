@@ -17,13 +17,14 @@ use UnitEnum;
 
 class ParentClassificationResource extends Resource
 {
-    protected static UnitEnum|string|null $navigationGroup = 'Classifications';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $model = ParentClassification::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Folder;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Classifications';
+    protected static ?string $navigationLabel = 'Parent Classifications';
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 

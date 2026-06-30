@@ -17,13 +17,14 @@ use UnitEnum;
 
 class SpecificClassificationResource extends Resource
 {
-    protected static UnitEnum|string|null $navigationGroup = 'Classifications';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $model = SpecificClassification::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Folder;
+
+    protected static UnitEnum|string|null $navigationGroup = 'Classifications';
+    protected static ?string $navigationLabel = 'Specific Classifications';
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
 
