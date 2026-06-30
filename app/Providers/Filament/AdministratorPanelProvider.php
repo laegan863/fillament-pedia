@@ -55,6 +55,10 @@ class AdministratorPanelProvider extends PanelProvider
                 NavigationGroup::make()
                 ->label('Classifications')
                 ->collapsible(),
+
+                NavigationGroup::make()
+                ->label('Roles & Permissions')
+                ->collapsible(false),
             ])
             ->pages([
                 Dashboard::class,
@@ -77,7 +81,10 @@ class AdministratorPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->plugins([
-                FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                ->navigationGroup('Roles & Permissions')
+                ->navigationLabel('Manage')
+                ->navigationSort(2),
             ])
             ->authMiddleware([
                 Authenticate::class,

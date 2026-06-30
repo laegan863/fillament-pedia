@@ -81,12 +81,12 @@ class PatientFollowUpFormForm
                         Radio::make('has_change_in_diagnosis')
                             ->label('Is there a change in Diagnosis?')
                             ->options([
-                                1 => 'Yes',
-                                0 => 'No',
+                                '1' => 'Yes',
+                                '0' => 'No',
                             ])
                             ->inline()
-                            ->default(0)
-                            ->afterStateHydrated(fn (Radio $component, $state) => $component->state((int) $state)),
+                            ->default('0')
+                            ->afterStateHydrated(fn (Radio $component, $state) => $component->state($state ? '1' : '0')),
 
                         Radio::make('has_more_than_one_primary_site')
                             ->label('Was there more than one primary site being treated in the past quarter?')
@@ -100,9 +100,8 @@ class PatientFollowUpFormForm
                         Section::make('Ammendment Form')
                             ->description('(Filled for cases of additional diagnosis, change in diagnosis, and other adjustments caused by additional information/testing)')
                             ->relationship('patientFollowupAmmendment')
-                            ->visible(fn (Get $get): bool => (int) ($get('has_change_in_diagnosis') ?? 0) === 1)
-                            ->visibleJs(<<<'JS'
-                                Number($get('has_change_in_diagnosis')) === 1
+                            ->hiddenJs(<<<'JS'
+                                $get('has_change_in_diagnosis') !== '1'
                             JS)
                             ->columnSpanFull()
                             ->schema(PatientFollowupAmmendmentsForm::schema()),
