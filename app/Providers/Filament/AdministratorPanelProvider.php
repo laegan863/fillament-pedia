@@ -57,7 +57,7 @@ class AdministratorPanelProvider extends PanelProvider
                 ->collapsible(),
 
                 NavigationGroup::make()
-                ->label('Roles & Permissions')
+                ->label('Settings')
                 ->collapsible(false),
             ])
             ->pages([
@@ -82,12 +82,15 @@ class AdministratorPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make()
-                ->navigationGroup('Roles & Permissions')
-                ->navigationLabel('Manage')
+                ->navigationGroup('Settings')
+                ->navigationLabel('Roles & Permissions')
                 ->navigationSort(2),
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->resources([
+                config('filament-logger.activity_resource'),
             ]);
     }
 }

@@ -28,7 +28,6 @@ class UserForm
                     ->maxLength(255),
                 Select::make('roles')
                     ->relationship('roles', 'name')
-                    ->multiple()
                     ->preload()
                     ->searchable(),
             ]);
