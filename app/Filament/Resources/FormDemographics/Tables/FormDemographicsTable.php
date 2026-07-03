@@ -7,6 +7,7 @@ use App\Filament\Resources\PatientFollowUpForms\PatientFollowUpFormResource;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+// use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
@@ -32,6 +33,7 @@ class FormDemographicsTable
 
             ])
             ->recordActions([
+                // DeleteAction::make(),
                 EditAction::make(),
                 ViewAction::make(),
 
