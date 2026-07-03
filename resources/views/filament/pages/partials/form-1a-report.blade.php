@@ -15,6 +15,27 @@
 
 <div class="space-y-4 {{ $forPdf ? 'text-[11px] text-black' : 'text-sm text-gray-800 dark:text-gray-100' }}" style="padding: 20px;">
     @if ($forPdf)
+        <style>
+            .pdf-report-table thead {
+                display: table-header-group;
+            }
+
+            .pdf-report-table tr,
+            .pdf-report-table td,
+            .pdf-report-table th {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .pdf-report-table td,
+            .pdf-report-table th {
+                word-break: keep-all;
+                overflow-wrap: anywhere;
+            }
+        </style>
+    @endif
+
+    @if ($forPdf)
         {{-- PDF: PCC Official Letterhead --}}
         <div style="text-align: center; margin-bottom: 14px; font-family: Arial, sans-serif; line-height: 1.5;">
             <div style="font-size: 11px;">Republic of the Philippines</div>
@@ -155,7 +176,7 @@
     </div>
     @endif
 
-    <table class="w-full border-collapse {{ $forPdf ? 'text-[10px]' : 'text-xs' }}">
+    <table class="pdf-report-table w-full border-collapse {{ $forPdf ? 'text-[10px]' : 'text-xs' }}">
         <thead>
             <tr>
                 <th rowspan="2" class="border border-gray-500 bg-gray-200 px-2 py-1.5 text-left font-semibold {{ $forPdf ? '' : 'sticky top-0 z-30' }}">CANCER TREATMENT</th>
