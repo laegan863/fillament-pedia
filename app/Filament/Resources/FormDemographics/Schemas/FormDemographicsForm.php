@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\FormDemographics\Schemas;
 
+use App\Models\FormDemographics;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
@@ -84,6 +85,18 @@ class FormDemographicsForm
 
                                             throw ValidationException::withMessages([
                                                 'data.health_facility_id_no' => 'Please enter Health Facility ID No.',
+                                            ]);
+                                        }
+
+                                        if (FormDemographics::where('health_facility_id_no', $healthFacilityId)->exists()) {
+                                            Notification::make()
+                                                ->title('Health Facility ID No. already exists')
+                                                ->body('The Health Facility ID No. you entered is already associated with another patient record.')
+                                                ->danger()
+                                                ->send();
+
+                                            throw ValidationException::withMessages([
+                                                'data.health_facility_id_no' => 'The Health Facility ID No. you entered is already associated with another patient record.',
                                             ]);
                                         }
 

@@ -4,6 +4,7 @@
             <div class="custom-login-brand">
                 <span class="custom-login-brand-mark">
                     <img
+                        class="custom-login-brand-logo"
                         src="{{ asset('bg.png') }}"
                         alt="Hospital registry seal"
                     >
@@ -42,6 +43,7 @@
                     src="{{ asset('bg.png') }}"
                     alt="Hospital registry seal"
                     class="custom-login-logo"
+                
                 >
 
                 <p class="custom-login-eyebrow">Secure administrator access</p>
