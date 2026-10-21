@@ -161,6 +161,7 @@ class PatientFollowUpFormForm
                                 'default' => 1,
                                 'md' => 2,
                             ])
+                            ->live()
                             ->bulkToggleable(),
                     ]),
 
