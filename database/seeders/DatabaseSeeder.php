@@ -15,7 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(CancerDiagnosisClassificationSeeder::class);
+        $this->call([
+            CancerClassificationSeeder::class,
+            AdminUserSeeder::class,
+        ]);
 
         // User::factory(10)->create();
 
