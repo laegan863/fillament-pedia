@@ -9,27 +9,24 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-
 
 class CancerDiagnosesTable
 {
-
     public static function configure(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(function (Builder $query): Builder {
-                    return $query
-                        ->with('formDemographic')
-                        ->when(
-                            request()->filled('formId'),
-                            fn (Builder $query) => $query->where(
-                                'form_demographic_id',
-                                request()->integer('formId')
-                            )
-                        );
-                })
+                return $query
+                    ->with('formDemographic')
+                    ->when(
+                        request()->filled('formId'),
+                        fn (Builder $query) => $query->where(
+                            'form_demographic_id',
+                            request()->integer('formId')
+                        )
+                    );
+            })
             ->columns([
                 TextColumn::make('id')
                     ->label('ID')
@@ -48,7 +45,7 @@ class CancerDiagnosesTable
                     ->searchable(),
                 TextColumn::make('created_at')->label('Created Date')->sortable()->searchable()->dateTime(),
                 TextColumn::make('iccc_specific_classification')->label('ICC Specific Classification')
-                ->sortable()->searchable(),
+                    ->sortable()->searchable(),
                 TextColumn::make('clinical_stage')->label('Clinical Stage')->sortable()->searchable(),
                 TextColumn::make('diagnosis_date')->label('Date of Diagnosis')->sortable()->searchable()->dateTime(),
             ])
@@ -61,6 +58,7 @@ class CancerDiagnosesTable
                     ->label('View Form')
                     ->icon('heroicon-o-eye')
                     ->openUrlInNewTab()
+                    ->authorize('view')
                     ->url(fn ($record): string => route('form-details', ['cancerDiagnose' => $record])),
             ])
             ->toolbarActions([

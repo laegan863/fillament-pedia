@@ -7,4 +7,6 @@ Route::get('/', function () {
     return redirect('administrator');
 });
 
-Route::get('form-details/{cancerDiagnose}', [CustomController::class, 'showForm'])->name('form-details');
+Route::get('form-details/{cancerDiagnose}', [CustomController::class, 'showForm'])
+    ->middleware(['auth', 'can:view,cancerDiagnose'])
+    ->name('form-details');
