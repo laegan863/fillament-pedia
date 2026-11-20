@@ -63,7 +63,8 @@ test('the patient record form marks every PSGC address dropdown as coming from t
 
     $html = Livewire::test(CreateFormDemographics::class)->html();
 
-    expect(substr_count($html, GuidedTour::PSA_SOURCE_LABEL))->toBe(10)
+    expect($html)->not->toContain('Source: PSA')
+        ->and($html)->not->toContain('These options come from the Philippine Standard Geographic Code')
         ->and(substr_count($html, 'data-source="psa-psgc"'))->toBe(10)
         ->and(substr_count($html, 'data-tour="psgc-birthplace"'))->toBe(2)
         ->and(substr_count($html, 'data-tour="psgc-permanent-address"'))->toBe(4)

@@ -20,10 +20,6 @@ class GuidedTour
 
     private const ROUTE_PREFIX = 'filament.administrator.';
 
-    public const PSA_SOURCE_LABEL = 'Source: PSA';
-
-    public const PSA_SOURCE_TOOLTIP = 'These options come from the Philippine Standard Geographic Code (PSGC) published by the Philippine Statistics Authority (PSA).';
-
     /**
      * @return array{id: string, title: string, steps: list<array{target: ?string, match: string, title: string, body: string}>}|null
      */
@@ -147,7 +143,7 @@ class GuidedTour
                 [
                     'target' => '[data-tour="psgc-birthplace"]',
                     'title' => 'Place of birth — from PSA',
-                    'body' => 'Province and city/municipality lists come from the PSA\'s Philippine Standard Geographic Code (PSGC). Look for the "'.self::PSA_SOURCE_LABEL.'" badge.',
+                    'body' => 'Province and city/municipality lists come from the PSA\'s Philippine Standard Geographic Code (PSGC).',
                 ],
                 [
                     'target' => '[data-tour="psgc-permanent-address"]',

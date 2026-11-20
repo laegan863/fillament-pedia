@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\FormDemographics\Schemas;
 
 use App\Models\FormDemographics;
-use App\Services\GuidedTour;
 use App\Services\PsgcAddressLookup;
 use Carbon\Carbon;
 use Closure;
@@ -20,7 +19,6 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -539,15 +537,11 @@ class FormDemographicsForm
     }
 
     /**
-     * Marks a dropdown as sourced from the PSA's PSGC with a visible hint badge, and tags its wrapper
-     * so the guided tour can spotlight it.
+     * Tags a PSGC-sourced dropdown's wrapper so the guided tour can spotlight it.
      */
     private static function fromPsa(Select $select, string $tourAnchor): Select
     {
         return $select
-            ->hint(GuidedTour::PSA_SOURCE_LABEL)
-            ->hintIcon(Heroicon::OutlinedBuildingLibrary, tooltip: GuidedTour::PSA_SOURCE_TOOLTIP)
-            ->hintColor('info')
             ->extraFieldWrapperAttributes([
                 'data-tour' => $tourAnchor,
                 'data-source' => 'psa-psgc',
