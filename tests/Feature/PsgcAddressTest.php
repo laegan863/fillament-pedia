@@ -8,6 +8,7 @@ use App\Models\Province;
 use App\Models\Region;
 use App\Models\User;
 use App\Services\PsgcAddressLookup;
+use Database\Seeders\PsgcAddressSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\File;
@@ -83,6 +84,22 @@ test('psgc import reads json files from a local folder', function (): void {
     File::deleteDirectory($folder);
 
     expect(Barangay::query()->sole()->name)->toBe('Poblacion');
+});
+
+test('psgc seeder loads the bundled address list without internet access', function (): void {
+    Http::preventStrayRequests();
+
+    $this->seed(PsgcAddressSeeder::class);
+
+    expect(Region::query()->count())->toBe(17)
+        ->and(Province::query()->count())->toBe(81)
+        ->and(CityMunicipality::query()->count())->toBe(1634)
+        ->and(Barangay::query()->count())->toBe(42046)
+        ->and(Region::query()->pluck('name')->all())->toContain('Region VI (Western Visayas)')
+        ->and(Barangay::query()->whereNotIn(
+            'city_municipality_code',
+            CityMunicipality::query()->select('code'),
+        )->exists())->toBeFalse();
 });
 
 test('address options cascade from region down to barangay', function (): void {

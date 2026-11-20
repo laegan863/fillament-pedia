@@ -19,8 +19,8 @@ use RuntimeException;
  * Imports the Philippine Standard Geographic Code (PSGC) masterlist used by the address dropdowns.
  *
  * Data comes from the PSGC API (https://psgc.gitlab.io/api), which mirrors the PSA publication.
- * For servers without internet access, download regions.json, provinces.json,
- * cities-municipalities.json and barangays.json from that API and pass the folder with --path.
+ * A copy is bundled in database/seeders/data/psgc and loaded by PsgcAddressSeeder, for servers
+ * without internet access. Any folder with the same four JSON files can be passed with --path.
  */
 #[Signature('psgc:import
     {--source=https://psgc.gitlab.io/api : Base URL of the PSGC API}
@@ -120,7 +120,7 @@ class ImportPsgcAddresses extends Command
                         ->json();
                 });
             } catch (ConnectionException $exception) {
-                throw new RuntimeException("Unable to download {$url}: {$exception->getMessage()}");
+                throw new RuntimeException("Unable to download {$url}: {$exception->getMessage()}. To use the copy bundled with the application instead, run: php artisan db:seed --class=PsgcAddressSeeder");
             }
         }
 

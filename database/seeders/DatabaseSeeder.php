@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(CancerDiagnosisClassificationSeeder::class);
+        $this->call(PsgcAddressSeeder::class);
 
         // User::factory(10)->create();
 
