@@ -95,7 +95,9 @@ class PatientFollowUpFormForm
                                 '0' => 'No',
                             ])
                             ->inline()
-                            ->default('0'),
+                            ->default('0')
+                            ->afterStateHydrated(fn (Radio $component, $state) => $component->state($state ? '1' : '0'))
+                            ->dehydrateStateUsing(fn ($state): bool => (bool) $state),
 
                         Section::make('Ammendment Form')
                             ->description('(Filled for cases of additional diagnosis, change in diagnosis, and other adjustments caused by additional information/testing)')

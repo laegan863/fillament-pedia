@@ -327,6 +327,7 @@ class CancerDiagnoseForm
                         CheckboxList::make('multidisciplinary_disciplines')
                             ->label('Disciplines Involved')
                             ->options([
+                                'Surgery' => 'Surgery',
                                 'Anesthesia / Pain' => 'Anesthesia / Pain',
                                 'Child Life Specialist' => 'Child Life Specialist',
                                 'Complementary and Alternative' => 'Complementary and Alternative',

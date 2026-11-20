@@ -6,7 +6,7 @@
 
     <div class="space-y-6">
 
-        <x-filament::section>
+        <x-filament::section data-tour="report-templates">
             <x-slot name="heading">
                 Reporting Forms Templates
             </x-slot>

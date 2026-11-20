@@ -71,17 +71,5 @@
         </tbody>
     </table>
 
-    <div class="grid grid-cols-2 gap-14 pt-10 text-center text-[13px]">
-        <div>
-            <div class="mb-8 text-left font-semibold">Prepared by:</div>
-            <div class="border-t border-gray-700 pt-1 font-semibold">{{ $report['prepared_by_name'] ?? '' }}</div>
-            <div class="font-semibold text-gray-600">{{ $report['prepared_by_position'] ?? '' }}</div>
-        </div>
-
-        <div>
-            <div class="mb-8 text-left font-semibold">Noted by:</div>
-            <div class="border-t border-gray-700 pt-1 font-semibold">{{ $report['noted_by_name'] ?? '' }}</div>
-            <div class="font-semibold text-gray-600">{{ $report['noted_by_position'] ?? '' }}</div>
-        </div>
-    </div>
+    @include('filament.pages.partials.report-signatories', ['report' => $report])
 </div>

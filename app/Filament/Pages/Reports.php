@@ -10,13 +10,16 @@ use App\Models\PatientFollowUpFormPalliativeCare;
 use App\Models\PatientFollowUpFormRadiotherapy;
 use App\Models\PatientFollowUpFormSurgery;
 use App\Models\PatientFollowUpFormTheranostic;
+use App\Models\Signatory;
 use App\Models\SpecificClassification;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Carbon;
 use Torgodly\Html2Media\Actions\Html2MediaAction;
@@ -183,10 +186,13 @@ class Reports extends Page
             ->schema([
                 TextInput::make('facility_name')
                     ->label('Health Facility Name')
+                    ->default('Corazon Locsin Montelibano Memorial Regional Hospital')
                     ->required(),
                 TextInput::make('facility_registration_no')
                     ->label('Health Facility Registration No.')
+                    ->default('4299')
                     ->required(),
+
                 DatePicker::make('from_date')
                     ->label('Date From')
                     ->required()
@@ -199,6 +205,33 @@ class Reports extends Page
                     ->minDate(now()->subYears(10)->startOfYear())
                     ->maxDate(now()->endOfYear())
                     ->afterOrEqual('from_date'),
+
+                Grid::make(2)
+                    ->schema([
+                        TextInput::make('prepared_by_name')
+                            ->label('Prepared By')
+                            ->default(fn (): ?string => auth()->user()?->name)
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('prepared_by_position')
+                            ->label('Prepared By Position')
+                            ->maxLength(255),
+                    ]),
+
+                Select::make('noted_by_signatory_id')
+                    ->label('Noted By')
+                    ->options(fn (): array => Signatory::query()
+                        ->active()
+                        ->orderBy('name')
+                        ->get(['id', 'name', 'position'])
+                        ->mapWithKeys(fn (Signatory $signatory): array => [
+                            $signatory->id => "{$signatory->name} — {$signatory->position}",
+                        ])
+                        ->all())
+                    ->default(fn (): ?int => Signatory::query()->active()->orderBy('name')->value('id'))
+                    ->searchable()
+                    ->required()
+                    ->helperText('Manage the list under Settings → Noted By.'),
             ])
             ->action(function (array $data, array $arguments): void {
                 $title = '';
@@ -491,6 +524,7 @@ class Reports extends Page
             'stages' => $this->form1AStages,
             'groups' => array_values($groups),
             'analytics' => $analytics,
+            ...$this->buildSignatories($data),
         ];
     }
 
@@ -570,10 +604,7 @@ class Reports extends Page
             'to_date' => $toDate->toDateString(),
             'report_submission_date' => now()->toDateString(),
             'rows' => $rows,
-            'prepared_by_name' => '',
-            'prepared_by_position' => '',
-            'noted_by_name' => '',
-            'noted_by_position' => 'CANCER COORDINATOR/ CANCER CENTER HEAD',
+            ...$this->buildSignatories($data),
         ];
     }
 
@@ -639,10 +670,7 @@ class Reports extends Page
             'to_date' => $toDate->toDateString(),
             'report_submission_date' => now()->toDateString(),
             'rows' => $rows,
-            'prepared_by_name' => '',
-            'prepared_by_position' => '',
-            'noted_by_name' => '',
-            'noted_by_position' => 'CANCER COORDINATOR/ CANCER CENTER HEAD',
+            ...$this->buildSignatories($data),
         ];
     }
 
@@ -808,10 +836,7 @@ class Reports extends Page
             'to_date' => $toDate->toDateString(),
             'report_submission_date' => now()->toDateString(),
             'rows' => $rows,
-            'prepared_by_name' => '',
-            'prepared_by_position' => '',
-            'noted_by_name' => '',
-            'noted_by_position' => 'CANCER COORDINATOR/ CANCER CENTER HEAD',
+            ...$this->buildSignatories($data),
         ];
     }
 
@@ -889,10 +914,7 @@ class Reports extends Page
             'to_date' => $toDate->toDateString(),
             'report_submission_date' => now()->toDateString(),
             'rows' => $rows,
-            'prepared_by_name' => '',
-            'prepared_by_position' => '',
-            'noted_by_name' => '',
-            'noted_by_position' => 'CANCER COORDINATOR/ CANCER CENTER HEAD',
+            ...$this->buildSignatories($data),
         ];
     }
 
@@ -959,10 +981,27 @@ class Reports extends Page
             'to_date' => $toDate->toDateString(),
             'report_submission_date' => now()->toDateString(),
             'rows' => $rows,
-            'prepared_by_name' => '',
-            'prepared_by_position' => '',
-            'noted_by_name' => '',
-            'noted_by_position' => 'CANCER COORDINATOR/ CANCER CENTER HEAD',
+            ...$this->buildSignatories($data),
+        ];
+    }
+
+    /**
+     * Resolve the "Prepared by" and "Noted by" signature block shown at the bottom of every report.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array{prepared_by_name: string, prepared_by_position: string, noted_by_name: string, noted_by_position: string}
+     */
+    protected function buildSignatories(array $data): array
+    {
+        $notedBy = filled($data['noted_by_signatory_id'] ?? null)
+            ? Signatory::query()->find($data['noted_by_signatory_id'])
+            : null;
+
+        return [
+            'prepared_by_name' => trim((string) ($data['prepared_by_name'] ?? '')),
+            'prepared_by_position' => trim((string) ($data['prepared_by_position'] ?? '')),
+            'noted_by_name' => (string) ($notedBy?->name ?? ''),
+            'noted_by_position' => (string) ($notedBy?->position ?? 'CANCER COORDINATOR/ CANCER CENTER HEAD'),
         ];
     }
 
@@ -1050,7 +1089,7 @@ class Reports extends Page
         $from = str_replace('-', '', (string) ($this->form1AReport['from_date'] ?? now()->toDateString()));
         $to = str_replace('-', '', (string) ($this->form1AReport['to_date'] ?? now()->toDateString()));
 
-        return uniqid() . "-reporting-form-1a-{$from}-to-{$to}";
+        return uniqid()."-reporting-form-1a-{$from}-to-{$to}";
     }
 
     protected function buildForm1BFilename(): string
@@ -1062,7 +1101,7 @@ class Reports extends Page
         $from = str_replace('-', '', (string) ($this->form1BReport['from_date'] ?? now()->toDateString()));
         $to = str_replace('-', '', (string) ($this->form1BReport['to_date'] ?? now()->toDateString()));
 
-        return uniqid() . "-reporting-form-1b-{$from}-to-{$to}";
+        return uniqid()."-reporting-form-1b-{$from}-to-{$to}";
     }
 
     protected function buildForm1CFilename(): string
@@ -1074,7 +1113,7 @@ class Reports extends Page
         $from = str_replace('-', '', (string) ($this->form1CReport['from_date'] ?? now()->toDateString()));
         $to = str_replace('-', '', (string) ($this->form1CReport['to_date'] ?? now()->toDateString()));
 
-        return uniqid() . "-reporting-form-1c-{$from}-to-{$to}";
+        return uniqid()."-reporting-form-1c-{$from}-to-{$to}";
     }
 
     protected function buildForm2AFilename(): string
@@ -1086,7 +1125,7 @@ class Reports extends Page
         $from = str_replace('-', '', (string) ($this->form2AReport['from_date'] ?? now()->toDateString()));
         $to = str_replace('-', '', (string) ($this->form2AReport['to_date'] ?? now()->toDateString()));
 
-        return uniqid() . "-reporting-form-2a-{$from}-to-{$to}";
+        return uniqid()."-reporting-form-2a-{$from}-to-{$to}";
     }
 
     protected function buildForm2BFilename(): string
@@ -1098,7 +1137,7 @@ class Reports extends Page
         $from = str_replace('-', '', (string) ($this->form2BReport['from_date'] ?? now()->toDateString()));
         $to = str_replace('-', '', (string) ($this->form2BReport['to_date'] ?? now()->toDateString()));
 
-        return uniqid() . "-reporting-form-2b-{$from}-to-{$to}";
+        return uniqid()."-reporting-form-2b-{$from}-to-{$to}";
     }
 
     protected function buildForm2CFilename(): string
@@ -1110,6 +1149,6 @@ class Reports extends Page
         $from = str_replace('-', '', (string) ($this->form2CReport['from_date'] ?? now()->toDateString()));
         $to = str_replace('-', '', (string) ($this->form2CReport['to_date'] ?? now()->toDateString()));
 
-        return uniqid() . "-reporting-form-2c-{$from}-to-{$to}";
+        return uniqid()."-reporting-form-2c-{$from}-to-{$to}";
     }
 }

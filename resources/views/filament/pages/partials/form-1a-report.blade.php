@@ -232,4 +232,6 @@
             @endforeach
         </tbody>
     </table>
+
+    @include('filament.pages.partials.report-signatories', ['report' => $report])
 </div>

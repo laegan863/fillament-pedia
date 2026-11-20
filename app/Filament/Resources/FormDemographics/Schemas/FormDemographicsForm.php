@@ -3,11 +3,15 @@
 namespace App\Filament\Resources\FormDemographics\Schemas;
 
 use App\Models\FormDemographics;
+use App\Services\GuidedTour;
+use App\Services\PsgcAddressLookup;
 use Carbon\Carbon;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Group;
@@ -16,6 +20,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -69,6 +74,7 @@ class FormDemographicsForm
                             ])
                             ->maxLength(50)
                             ->required()
+                            ->extraFieldWrapperAttributes(['data-tour' => 'health-facility-id'])
                             ->suffixAction(
                                 Action::make('validateHealthFacilityId')
                                     ->label('Validate')
@@ -169,16 +175,26 @@ class FormDemographicsForm
                                                     : null
                                             );
 
-                                            $set('birth_city_municipality', $patient->Birthplace ?? null);
-                                            $set('nationality', $patient->Nationality ?? null);
+                                            $birthplace = app(PsgcAddressLookup::class)->matchBirthplace($patient->Birthplace ?? null);
+
+                                            $set('birth_province', $birthplace['province']);
+                                            $set('birth_city_municipality', $birthplace['city_municipality']);
+                                            $set('nationality', self::countryFromNationality($patient->Nationality ?? null));
 
                                             $set('mobile_contact_no', $patient->ContactNo ?? null);
                                             $set('email_address', $patient->Email ?? null);
 
-                                            $set('permanent_barangay', $patient->Barangay ?? null);
-                                            $set('permanent_city_municipality', $patient->TownCity ?? null);
-                                            $set('permanent_province', $patient->Province ?? null);
-                                            $set('permanent_region', $patient->Region ?? null);
+                                            $permanentAddress = app(PsgcAddressLookup::class)->matchAddress(
+                                                region: $patient->Region ?? null,
+                                                province: $patient->Province ?? null,
+                                                cityMunicipality: $patient->TownCity ?? null,
+                                                barangay: $patient->Barangay ?? null,
+                                            );
+
+                                            $set('permanent_region', $permanentAddress['region']);
+                                            $set('permanent_province', $permanentAddress['province']);
+                                            $set('permanent_city_municipality', $permanentAddress['city_municipality']);
+                                            $set('permanent_barangay', $permanentAddress['barangay']);
 
                                             $set('civil_status', $patient->CivilStatus ?? null);
                                             $set('blood_type', $patient->BloodType ?? null);
@@ -273,33 +289,44 @@ class FormDemographicsForm
                         'xl' => 12,
                     ])
                     ->schema([
-                        TextInput::make('birth_province')
+                        self::fromPsa(Select::make('birth_province'), tourAnchor: 'psgc-birthplace')
                             ->label('Place of Birth - Province')
-                            ->maxLength(100)
-                            ->placeholder('Enter province of birth')
+                            ->placeholder('Select province of birth')
+                            ->searchable()
+                            ->options(fn (?string $state): array => app(PsgcAddressLookup::class)->withCurrentValue(
+                                app(PsgcAddressLookup::class)->birthProvinceOptions(),
+                                $state,
+                            ))
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('birth_city_municipality', null))
                             ->columnSpan([
                                 'md' => 1,
                                 'xl' => 6,
                             ])
                             ->required(),
 
-                        TextInput::make('birth_city_municipality')
+                        self::fromPsa(Select::make('birth_city_municipality'), tourAnchor: 'psgc-birthplace')
                             ->label('Place of Birth - City / Municipality')
-                            ->maxLength(100)
-                            ->placeholder('Enter city or municipality of birth')
+                            ->placeholder('Select city or municipality of birth')
+                            ->searchable()
+                            ->options(fn (Get $get, ?string $state): array => app(PsgcAddressLookup::class)->withCurrentValue(
+                                app(PsgcAddressLookup::class)->birthCityMunicipalityOptions($get('birth_province')),
+                                $state,
+                            ))
                             ->columnSpan([
                                 'md' => 1,
                                 'xl' => 6,
                             ])
                             ->required(),
 
-                        TextInput::make('nationality')
+                        Select::make('nationality')
                             ->label('Nationality')
                             ->default('PHILIPPINES')
-                            ->placeholder('Enter nationality')
+                            ->placeholder('Select country')
+                            ->options(fn (?string $state): array => self::nationalityOptions($state))
+                            ->searchable()
                             ->columnSpanFull()
-                            ->required()
-                            ->maxLength(100),
+                            ->required(),
 
                         TextInput::make('guardian_first_name')
                             ->label('Guardian First Name')
@@ -341,6 +368,7 @@ class FormDemographicsForm
                     ]),
 
                 Section::make('PhilHealth and Address')
+                    ->description('Region, Province, City / Municipality and Barangay options come from the Philippine Standard Geographic Code (PSGC) of the Philippine Statistics Authority (PSA).')
                     ->columnSpanFull()
                     ->columns([
                         'md' => 2,
@@ -348,54 +376,19 @@ class FormDemographicsForm
                     ])
                     ->schema([
 
-                        Group::make([
-                            Checkbox::make('philhealth_pin_na')
-                                ->label('PhilHealth PIN N/A'),
-
-                            TextInput::make('philhealth_pin')
+                        Group::make(self::notApplicableField(
+                            notApplicableField: 'philhealth_pin_na',
+                            notApplicableLabel: 'No PhilHealth PIN (N/A)',
+                            input: TextInput::make('philhealth_pin')
                                 ->label('PhilHealth PIN')
                                 ->placeholder('Enter PhilHealth PIN')
-                                ->maxLength(20)
-                                ->hiddenJs(<<<'JS'
-                                    $get('philhealth_pin_na')
-                                JS),
-                        ])->columnSpanFull(),
+                                ->maxLength(20),
+                        ))->columnSpanFull(),
 
-                        TextInput::make('permanent_region')
-                            ->label('Permanent Address - Region')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter region of permanent address')
-                            ->maxLength(100),
-
-                        TextInput::make('permanent_province')
-                            ->label('Permanent Address - Province')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter province of permanent address')
-                            ->maxLength(100),
-
-                        TextInput::make('permanent_city_municipality')
-                            ->label('Permanent Address - City / Municipality')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter city or municipality of permanent address')
-                            ->maxLength(100),
-
-                        TextInput::make('permanent_barangay')
-                            ->label('Permanent Address - Barangay')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter barangay of permanent address')
-                            ->maxLength(100),
+                        ...self::addressSelects(
+                            prefix: 'permanent',
+                            labelPrefix: 'Permanent Address',
+                        ),
 
                         Checkbox::make('same_as_permanent_address')
                             ->label('Current Address is same as Permanent Address')
@@ -412,47 +405,15 @@ class FormDemographicsForm
                                     $set('current_city_municipality', null);
                                     $set('current_barangay', null);
                                 }
-                            })->columnSpanFull(),
+                            })
+                            ->extraFieldWrapperAttributes(['data-tour' => 'same-as-permanent'])
+                            ->columnSpanFull(),
 
-                        TextInput::make('current_region')
-                            ->label('Current Address - Region')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter region of current address')
-                            ->maxLength(100)
-                            ->disabled(fn (Get $get): bool => (bool) $get('same_as_permanent_address')),
-
-                        TextInput::make('current_province')
-                            ->label('Current Address - Province')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter province of current address')
-                            ->maxLength(100)
-                            ->disabled(fn (Get $get): bool => (bool) $get('same_as_permanent_address')),
-
-                        TextInput::make('current_city_municipality')
-                            ->label('Current Address - City / Municipality')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter city or municipality of current address')
-                            ->maxLength(100)
-                            ->disabled(fn (Get $get): bool => (bool) $get('same_as_permanent_address')),
-
-                        TextInput::make('current_barangay')
-                            ->label('Current Address - Barangay')
-                            ->columnSpan([
-                                'md' => 1,
-                                'xl' => 3,
-                            ])
-                            ->placeholder('Enter barangay of current address')
-                            ->maxLength(100)
-                            ->disabled(fn (Get $get): bool => (bool) $get('same_as_permanent_address')),
+                        ...self::addressSelects(
+                            prefix: 'current',
+                            labelPrefix: 'Current Address',
+                            isDisabled: fn (Get $get): bool => (bool) $get('same_as_permanent_address'),
+                        ),
                     ]),
 
                 Section::make('Contact Details')
@@ -461,33 +422,25 @@ class FormDemographicsForm
                         'md' => 2,
                     ])
                     ->schema([
-                        Group::make([
-                            Checkbox::make('mobile_contact_na')
-                                ->label('Mobile Contact No. N/A'),
-
-                            TextInput::make('mobile_contact_no')
+                        Group::make(self::notApplicableField(
+                            notApplicableField: 'mobile_contact_na',
+                            notApplicableLabel: 'No Mobile Contact No. (N/A)',
+                            input: TextInput::make('mobile_contact_no')
                                 ->label('Mobile Contact No.')
-                                ->tel()
+                                ->tel(fn (Get $get): bool => ! $get('mobile_contact_na'))
                                 ->placeholder('Enter mobile contact number')
-                                ->maxLength(20)
-                                ->hiddenJs(<<<'JS'
-                                    $get('mobile_contact_na')
-                                JS),
-                        ])->columns(1),
+                                ->maxLength(20),
+                        ))->columns(1),
 
-                        Group::make([
-                            Checkbox::make('email_na')
-                                ->label('Email Address N/A'),
-
-                            TextInput::make('email_address')
+                        Group::make(self::notApplicableField(
+                            notApplicableField: 'email_na',
+                            notApplicableLabel: 'No Email Address (N/A)',
+                            input: TextInput::make('email_address')
                                 ->label('Email Address')
-                                ->email()
+                                ->email(fn (Get $get): bool => ! $get('email_na'))
                                 ->placeholder('Enter email address')
-                                ->maxLength(255)
-                                ->hiddenJs(<<<'JS'
-                                    $get('email_na')
-                                JS),
-                        ])->columns(1),
+                                ->maxLength(255),
+                        ))->columns(1),
                     ]),
 
                 Section::make('Relationship')
@@ -518,5 +471,157 @@ class FormDemographicsForm
                             ->columnSpanFull(),
                     ]),
             ]);
+    }
+
+    /**
+     * Country options labelled with their nationality (e.g. "Philippines (Filipino)"), keyed by the
+     * upper-cased country that is stored. A saved value not in the list is kept as its own option.
+     *
+     * @return array<string, string>
+     */
+    private static function nationalityOptions(?string $currentValue): array
+    {
+        $options = collect(config('nationalities'))
+            ->mapWithKeys(fn (string $country, string $nationality): array => [
+                strtoupper($country) => $country.' ('.str($nationality)->before(' (')->lower()->title().')',
+            ])
+            ->sort()
+            ->all();
+
+        if (filled($currentValue) && ! array_key_exists($currentValue, $options)) {
+            $options[$currentValue] = $currentValue;
+        }
+
+        return $options;
+    }
+
+    /**
+     * Converts a nationality from the hospital system (e.g. "Filipino") to the upper-cased country that
+     * is stored (e.g. "PHILIPPINES"). Values that are not a known nationality are kept, upper-cased.
+     */
+    public static function countryFromNationality(?string $nationality): ?string
+    {
+        if (blank($nationality)) {
+            return null;
+        }
+
+        $nationality = strtoupper(trim($nationality));
+        $country = config("nationalities.{$nationality}");
+
+        return $country === null ? $nationality : strtoupper($country);
+    }
+
+    /**
+     * Pairs an "N/A" checkbox with the input it applies to. Ticking N/A clears and hides the input
+     * in the browser, and the input is never validated or saved while N/A is ticked.
+     *
+     * @return array{0: Checkbox, 1: TextInput}
+     */
+    private static function notApplicableField(string $notApplicableField, string $notApplicableLabel, TextInput $input): array
+    {
+        $inputField = $input->getName();
+        $isNotApplicable = fn (Get $get): bool => (bool) $get($notApplicableField);
+
+        return [
+            Checkbox::make($notApplicableField)
+                ->label($notApplicableLabel)
+                ->extraFieldWrapperAttributes(['data-tour' => 'not-applicable'])
+                ->afterStateUpdatedJs(<<<JS
+                    if (\$state) { \$set('{$inputField}', null) }
+                JS),
+
+            $input
+                ->hiddenJs(<<<JS
+                    \$get('{$notApplicableField}')
+                JS)
+                ->dehydrateStateUsing(fn (?string $state, Get $get): ?string => $isNotApplicable($get) ? null : $state),
+        ];
+    }
+
+    /**
+     * Marks a dropdown as sourced from the PSA's PSGC with a visible hint badge, and tags its wrapper
+     * so the guided tour can spotlight it.
+     */
+    private static function fromPsa(Select $select, string $tourAnchor): Select
+    {
+        return $select
+            ->hint(GuidedTour::PSA_SOURCE_LABEL)
+            ->hintIcon(Heroicon::OutlinedBuildingLibrary, tooltip: GuidedTour::PSA_SOURCE_TOOLTIP)
+            ->hintColor('info')
+            ->extraFieldWrapperAttributes([
+                'data-tour' => $tourAnchor,
+                'data-source' => 'psa-psgc',
+            ], merge: true);
+    }
+
+    /**
+     * Builds the dependent Region → Province → City/Municipality → Barangay dropdowns sourced from the PSGC.
+     * Values are stored as names; a value not found in the PSGC is kept as its own option.
+     *
+     * @return list<Select>
+     */
+    private static function addressSelects(string $prefix, string $labelPrefix, ?Closure $isDisabled = null): array
+    {
+        $regionField = "{$prefix}_region";
+        $provinceField = "{$prefix}_province";
+        $cityMunicipalityField = "{$prefix}_city_municipality";
+        $barangayField = "{$prefix}_barangay";
+
+        $lookup = fn (): PsgcAddressLookup => app(PsgcAddressLookup::class);
+
+        $configure = fn (Select $select): Select => self::fromPsa($select, tourAnchor: "psgc-{$prefix}-address")
+            ->columnSpan([
+                'md' => 1,
+                'xl' => 3,
+            ])
+            ->searchable()
+            ->disabled($isDisabled ?? false)
+            ->dehydrated();
+
+        return [
+            $configure(Select::make($regionField))
+                ->label("{$labelPrefix} - Region")
+                ->placeholder('Select region')
+                ->options(fn (?string $state): array => $lookup()->withCurrentValue($lookup()->regionOptions(), $state))
+                ->live()
+                ->afterStateUpdated(function (Set $set) use ($provinceField, $cityMunicipalityField, $barangayField): void {
+                    $set($provinceField, null);
+                    $set($cityMunicipalityField, null);
+                    $set($barangayField, null);
+                }),
+
+            $configure(Select::make($provinceField))
+                ->label("{$labelPrefix} - Province")
+                ->placeholder('Select province')
+                ->options(fn (Get $get, ?string $state): array => $lookup()->withCurrentValue(
+                    $lookup()->provinceOptions($get($regionField)),
+                    $state,
+                ))
+                ->live()
+                ->afterStateUpdated(function (Set $set) use ($cityMunicipalityField, $barangayField): void {
+                    $set($cityMunicipalityField, null);
+                    $set($barangayField, null);
+                }),
+
+            $configure(Select::make($cityMunicipalityField))
+                ->label("{$labelPrefix} - City / Municipality")
+                ->placeholder('Select city or municipality')
+                ->options(fn (Get $get, ?string $state): array => $lookup()->withCurrentValue(
+                    $lookup()->cityMunicipalityOptions($get($regionField), $get($provinceField)),
+                    $state,
+                ))
+                ->live()
+                ->afterStateUpdated(function (Set $set) use ($barangayField): void {
+                    $set($barangayField, null);
+                }),
+
+            $configure(Select::make($barangayField))
+                ->label("{$labelPrefix} - Barangay")
+                ->placeholder('Select barangay')
+                ->options(fn (Get $get, ?string $state): array => $lookup()->withCurrentValue(
+                    $lookup()->barangayOptions($get($regionField), $get($provinceField), $get($cityMunicipalityField)),
+                    $state,
+                )),
+        ];
     }
 }

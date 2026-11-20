@@ -111,6 +111,11 @@ class FormDemographics extends Model
         return $this->hasMany(CancerDiagnose::class, 'form_demographic_id');
     }
 
+    public function patientFollowUpForms(): HasMany
+    {
+        return $this->hasMany(PatientFollowUpForm::class, 'form_demographic_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Accessors / Helpers
